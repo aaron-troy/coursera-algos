@@ -8,14 +8,16 @@ class MinHeap:
         Constructor. Here heap is implemented using a list.
         """
         self.heap_arr = [0]
+        self.val_arr = [0]
         self.heap_size = 0
 
-    def insert(self, key):
+    def insert(self, key, val):
         """
         Insert an entry with value key to the heap, maintain the heap structure
         """
-        # Append to the heap array
+        # Append to the heap and value arrays
         self.heap_arr.append(key)
+        self.val_arr.append(val)
         # Update the size
         self.heap_size += 1
         # Sift upwards to maintain the heap property
@@ -25,6 +27,7 @@ class MinHeap:
         """Remove entry i from the heap, maintain the heap structure"""
         # Remove the value at the specified index from the heaped array
         self.heap_arr.pop(i)
+        self.val_arr.pop(i)
         # Update the heap size
         self.heap_size -= 1
         # Sift downwards to maintain the heap property
@@ -69,6 +72,7 @@ class MinHeap:
             # Swap if necessary
             if self.heap_arr[i] < self.heap_arr[pt]:
                 self.heap_arr[i], self.heap_arr[pt] = self.heap_arr[pt], self.heap_arr[i]
+                self.val_arr[i], self.val_arr[pt] = self.val_arr[pt], self.val_arr[i]
             # Get the new parent
             i = pt
             pt = self.parent(pt)
@@ -84,19 +88,21 @@ class MinHeap:
         while mc:
             if self.heap_arr[mc] < self.heap_arr[i]:
                 self.heap_arr[i], self.heap_arr[mc] = self.heap_arr[mc], self.heap_arr[i]
+                self.val_arr[i], self.val_arr[mc] = self.val_arr[mc], self.val_arr[i]
             i = mc
             mc = self.min_child(mc)
 
-    def pop_min_val(self):
+    def pop_root(self):
         """
-        Returns the minimum value of the heap, dy definition the root.
+        Returns the minimum key and corresponding value of the heap, dy definition the root.
         """
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum val, stored at 1 index
-        val = self.heap_arr.pop(1)
+        min_key = self.heap_arr.pop(1)
+        min_val = self.val_arr.pop(1)
         # Update the heap size
         self.heap_size -= 1
         #Sift downwards to maintain the heap structure
         self.sift_down(1)
 
-        return val
+        return min_key, min_val
