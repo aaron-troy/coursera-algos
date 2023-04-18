@@ -31,5 +31,6 @@ class Graph:
             self.add_vert(end)
 
         self.verts[start].add_neighbor(end, weight)
+        self.verts[end].add_neighbor(start, weight)
 
 
