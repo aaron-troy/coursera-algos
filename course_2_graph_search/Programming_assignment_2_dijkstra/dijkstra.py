@@ -1,5 +1,12 @@
-import time, heap, graphs
+"""
+Application of Dijkstra's algorithm to compute shortest path lengths from a single
+starting vertex on an undirected weighted graph. Both naive and heap-based implementations
+are included here, with the latter running considerably faster (Nlog(N) vs M*N)
 
+The heap-based implementation uses a heap data structure, implemented as its own class.
+"""
+
+import time, heap, graphs
 
 def heap_dijkstra(G : graphs.Graph(), start : int):
     """
@@ -26,15 +33,18 @@ def heap_dijkstra(G : graphs.Graph(), start : int):
 
         # Add new frontier DGCs to the heap
         for n, w in G.verts[add].neighbors.items():
+            # If we've ealready explored here, move on
             if n in explored:
                 continue
+            # If we already have a path to this vertex in the heap, check if updating makes sense
             elif n in H.val_arr:
                 if (min_dgc + w) >= H.heap_arr[H.val_arr.index(n)]:
                     continue
                 else:
+                    # Delete the old path length if need be
                     H.delete(H.val_arr.index(n))
+            # Insert the new path length
             H.insert(min_dgc + w, n)
-
     return D
 
 def naive_dijkstra(G : graphs.Graph(), start : int):
@@ -102,11 +112,14 @@ def build_graph(source : str):
 if __name__ =="__main__":
     # Timing
     begin = time.time()
+
     # Source file for the input graph
     source = "dijkstraData.txt"
+    # Build the graph
     G = build_graph(source)
     print('Graph constructed in', time.time() - begin, "seconds.")
 
+    # Timing
     begin = time.time()
 
     # Compute shortest path lengths using naive Dijkstra implementation
@@ -120,6 +133,7 @@ if __name__ =="__main__":
         dists_of_interest.append(distances[v])
     print(dists_of_interest)
 
+    # Timing
     begin = time.time()
 
     # Compute shortest path lengths using heap Dijkstra implementation
@@ -127,8 +141,6 @@ if __name__ =="__main__":
     print("Heap Dijkstra ran in", time.time() - begin, "seconds")
 
     # Vertices of interest, for the course assignment
-    verts_of_interest = [7,37,59,82,99,115,133,165,188,197]
-    dists_of_interest = []
     for v in verts_of_interest:
         dists_of_interest.append(distances[v])
     print(dists_of_interest)
