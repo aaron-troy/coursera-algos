@@ -8,6 +8,16 @@ The heap-based implementation uses a heap data structure, implemented as its own
 
 import time, heap, graphs
 
+def check_heap(H):
+
+    arr = H.heap_arr.copy()
+    i = H.heap_size
+    while len(arr) > 2:
+        a = arr.pop()
+        if a < arr[int(i / 2)]:
+            print('Heap violated')
+        i -= 1
+
 def heap_dijkstra(G : graphs.Graph(), start : int):
     """
     Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
@@ -26,23 +36,21 @@ def heap_dijkstra(G : graphs.Graph(), start : int):
         H.insert(w, n)
 
     while explored != vert_set:
+
         # Get the root from the heap and add it to the explored set
         min_dgc, add = H.pop_root()
-        D[add] = min_dgc
-        explored.add(add)
+        if add not in explored:
+            D[add] = min_dgc
+            explored.add(add)
 
         # Add new frontier DGCs to the heap
         for n, w in G.verts[add].neighbors.items():
-            # If we've ealready explored here, move on
+            # If we've already explored here, move on
             if n in explored:
                 continue
-            # If we already have a path to this vertex in the heap, check if updating makes sense
             elif n in H.val_arr:
-                if (min_dgc + w) >= H.heap_arr[H.val_arr.index(n)]:
+                if H.heap_arr[H.val_arr.index(n)] < min_dgc + w:
                     continue
-                else:
-                    # Delete the old path length if need be
-                    H.delete(H.val_arr.index(n))
             # Insert the new path length
             H.insert(min_dgc + w, n)
     return D
@@ -123,25 +131,27 @@ if __name__ =="__main__":
     begin = time.time()
 
     # Compute shortest path lengths using naive Dijkstra implementation
-    distances = naive_dijkstra(G, 1)
+    distances_naive = naive_dijkstra(G, 1)
     print("Naive Dijkstra ran in", time.time() - begin, "seconds")
 
     # Vertices of interest, for the course assignment
     verts_of_interest = [7, 37, 59, 82, 99, 115, 133, 165, 188, 197]
     dists_of_interest = []
     for v in verts_of_interest:
-        dists_of_interest.append(distances[v])
+        dists_of_interest.append(distances_naive[v])
     print(dists_of_interest)
 
     # Timing
     begin = time.time()
 
     # Compute shortest path lengths using heap Dijkstra implementation
-    distances = heap_dijkstra(G, 1)
+    distances_heap = heap_dijkstra(G, 1)
     print("Heap Dijkstra ran in", time.time() - begin, "seconds")
-
+    dists_of_interest = []
     # Vertices of interest, for the course assignment
     for v in verts_of_interest:
-        dists_of_interest.append(distances[v])
+        dists_of_interest.append(distances_heap[v])
     print(dists_of_interest)
+
+    print(distances_heap == distances_naive)
 
