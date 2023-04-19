@@ -23,6 +23,30 @@ class MinHeap:
         # Sift upwards to maintain the heap property
         self.sift_up(self.heap_size)
 
+    def delete(self, key):
+        """
+        Delete an entry with arbitrary position from the heap
+        :param key: heap key to delete
+        """
+        # Move replace the entry to delete with the last entry of the heap
+        if key == self.heap_size:
+            return
+        self.heap_arr[key] = self.heap_arr[self.heap_size]
+        self.val_arr[key] = self.val_arr[self.heap_size]
+        *self.heap_arr, _ = self.heap_arr
+        *self.val_arr, _ = self.val_arr
+
+        # Update the heap size
+        self.heap_size -= 1
+
+        # If the replacing element is greater than the parent, sift up. Otherwise sift down
+        if self.parent(key):
+            if self.parent(key) > self.heap_arr[key]:
+                self.sift_up(key)
+            else:
+                self.sift_down(key)
+
+
     def min_child(self, i):
         """
         Return the minimum child for entry i, if it exists

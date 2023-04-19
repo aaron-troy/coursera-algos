@@ -38,8 +38,11 @@ def heap_dijkstra(G : graphs.Graph(), start : int):
             if n in explored:
                 continue
             elif n in H.val_arr:
-                if H.heap_arr[H.val_arr.index(n)] < min_dgc + w:
+                # If the new path is longer or equal to than an existing one, don't add it
+                if min_dgc + w >= H.heap_arr[H.val_arr.index(n)]:
                     continue
+                else:
+                    H.delete(H.val_arr.index(n))
             # Insert the new path length
             H.insert(min_dgc + w, n)
     return D
@@ -142,5 +145,4 @@ if __name__ =="__main__":
         dists_of_interest.append(distances_heap[v])
     print(dists_of_interest)
 
-    print(distances_heap == distances_naive)
 
