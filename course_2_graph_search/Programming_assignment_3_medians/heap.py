@@ -1,6 +1,9 @@
 """
 Class for a min-heap data structure
 """
+"""
+Class for a min-heap data structure
+"""
 class MinHeap:
 
     def __init__(self):
@@ -21,15 +24,27 @@ class MinHeap:
         # Sift upwards to maintain the heap property
         self.sift_up(self.heap_size)
 
-    def delete(self, i):
-        """Remove entry i from the heap, maintain the heap structure"""
-        # Remove the value at the specified index from the heaped array
-        self.heap_arr.pop(i)
-        self.val_arr.pop(i)
+    def delete(self, key):
+        """
+        Delete an entry with arbitrary position from the heap
+        :param key: heap key to delete
+        """
+        # Move replace the entry to delete with the last entry of the heap
+        if key == self.heap_size:
+            return
+        self.heap_arr[key] = self.heap_arr[self.heap_size]
+        *self.heap_arr, _ = self.heap_arr
+
         # Update the heap size
         self.heap_size -= 1
-        # Sift downwards to maintain the heap property
-        self.sift_down(i)
+
+        # If the replacing element is greater than the parent, sift up. Otherwise sift down
+        if self.parent(key):
+            if self.parent(key) > self.heap_arr[key]:
+                self.sift_up(key)
+            else:
+                self.sift_down(key)
+
 
     def min_child(self, i):
         """
@@ -53,7 +68,6 @@ class MinHeap:
         Get the parent for heap entry i, if it exists
         """
         pt = int(i / 2)
-
         if pt == 0:
             return None
         else:
@@ -86,34 +100,25 @@ class MinHeap:
             if self.heap_arr[mc] < self.heap_arr[i]:
                 self.heap_arr[i], self.heap_arr[mc] = self.heap_arr[mc], self.heap_arr[i]
             i = mc
-            mc = self.min_child(mc)
+            mc = self.min_child(i)
 
     def pop_root(self):
         """
         Returns the minimum key and corresponding value of the heap, dy definition the root.
         """
         assert self.heap_size > 0, 'Empty heap!'
-
-        # Get minimum child for the root:
-        mc = self.min_child(1)
-
         # Get the minimum val, stored at 1 index
         min_key = self.heap_arr[1]
+
+        # Move the end entry to the root of the heap
+        self.heap_arr[1] = self.heap_arr[self.heap_size]
+        *self.heap_arr, _ = self.heap_arr
 
         # Update the heap size
         self.heap_size -= 1
 
-        # Move the min child to the root
-        if mc:
-            self.heap_arr[1] = self.heap_arr[mc]
-            self.heap_arr.pop(mc)
-            # Sift downwards to maintain the heap structure
-            self.sift_down(mc)
-        else:
-            self.heap_arr.pop(1)
-
-
-
+        # Sift downwards to maintain the heap structure
+        self.sift_down(1)
 
         return min_key
 
@@ -134,21 +139,33 @@ class MaxHeap:
         """
         Insert an entry with value key to the heap, maintain the heap structure
         """
-        # Append to the heap and value arrays
+        # Append to the heap array
         self.heap_arr.append(key)
         # Update the size
         self.heap_size += 1
         # Sift upwards to maintain the heap property
         self.sift_up(self.heap_size)
 
-    def delete(self, i):
-        """Remove entry i from the heap, maintain the heap structure"""
-        # Remove the value at the specified index from the heaped array
-        self.heap_arr.pop(i)
+    def delete(self, key):
+        """
+        Delete an entry with arbitrary position from the heap
+        :param key: heap key to delete
+        """
+        # Move replace the entry to delete with the last entry of the heap
+        if key == self.heap_size:
+            return
+        self.heap_arr[key] = self.heap_arr[self.heap_size]
+        *self.heap_arr, _ = self.heap_arr
+
         # Update the heap size
         self.heap_size -= 1
-        # Sift downwards to maintain the heap property
-        self.sift_down(i)
+
+        # If the replacing element is greater than the parent, sift up. Otherwise sift down
+        if self.parent(key):
+            if self.parent(key) < self.heap_arr[key]:
+                self.sift_up(key)
+            else:
+                self.sift_down(key)
 
     def max_child(self, i):
         """
@@ -172,7 +189,6 @@ class MaxHeap:
         Get the parent for heap entry i, if it exists
         """
         pt = int(i / 2)
-
         if pt == 0:
             return None
         else:
@@ -198,37 +214,32 @@ class MaxHeap:
         """
         Sift downwards, starting from entry i to maintain the heap structure
         """
-        # Get the max child of the starting node
+        # Get the min child of the starting node
         mc = self.max_child(i)
 
-        # If the child exists, see if it is bigger than the parent
+        # If the child exists, see if it is smaller than the parent
         while mc:
             if self.heap_arr[mc] > self.heap_arr[i]:
                 self.heap_arr[i], self.heap_arr[mc] = self.heap_arr[mc], self.heap_arr[i]
             i = mc
-            mc = self.max_child(mc)
+            mc = self.max_child(i)
 
     def pop_root(self):
         """
         Returns the minimum key and corresponding value of the heap, dy definition the root.
         """
         assert self.heap_size > 0, 'Empty heap!'
-
-        # Get maximum child for the root:
-        mc = self.max_child(1)
-
         # Get the minimum val, stored at 1 index
         max_key = self.heap_arr[1]
+
+        # Move the end entry to the root of the heap
+        self.heap_arr[1] = self.heap_arr[self.heap_size]
+        *self.heap_arr, _ = self.heap_arr
 
         # Update the heap size
         self.heap_size -= 1
 
-        # Move the min child to the root
-        if mc:
-            self.heap_arr[1] = self.heap_arr[mc]
-            self.heap_arr.pop(mc)
-            # Sift downwards to maintain the heap structure
-            self.sift_down(mc)
-        else:
-            self.heap_arr.pop(1)
+        # Sift downwards to maintain the heap structure
+        self.sift_down(1)
+
         return max_key

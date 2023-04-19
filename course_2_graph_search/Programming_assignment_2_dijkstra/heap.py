@@ -39,7 +39,7 @@ class MinHeap:
         # Update the heap size
         self.heap_size -= 1
 
-        # If the replacing element is greater than the parent, sift up. Otherwise sift down
+        # If the replacing element is less than the parent, sift up. Otherwise sift down
         if self.parent(key):
             if self.parent(key) > self.heap_arr[key]:
                 self.sift_up(key)
