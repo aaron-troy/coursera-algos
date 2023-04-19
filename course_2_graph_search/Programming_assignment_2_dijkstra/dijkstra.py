@@ -7,17 +7,6 @@ The heap-based implementation uses a heap data structure, implemented as its own
 """
 
 import time, heap, graphs
-
-def check_heap(H):
-
-    arr = H.heap_arr.copy()
-    i = H.heap_size
-    while len(arr) > 2:
-        a = arr.pop()
-        if a < arr[int(i / 2)]:
-            print('Heap violated')
-        i -= 1
-
 def heap_dijkstra(G : graphs.Graph(), start : int):
     """
     Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
