@@ -1,9 +1,6 @@
 """
 Class for a min-heap data structure
 """
-"""
-Class for a min-heap data structure
-"""
 class MinHeap:
 
     def __init__(self):
@@ -125,7 +122,6 @@ class MinHeap:
     """
     Class for a min-heap data structure
     """
-
 class MaxHeap:
 
     def __init__(self):

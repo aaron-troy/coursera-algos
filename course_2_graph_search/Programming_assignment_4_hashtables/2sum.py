@@ -1,4 +1,4 @@
-
+import time
 
 def read_input(src : str):
     arr = []
@@ -10,18 +10,16 @@ def read_input(src : str):
 def compute_2sum(A : list, lw_bnd : int, up_bnd : int):
 
     # Construct dict hash table
-    H = {}
+    H = A
 
     pairs = 0
 
     for i in range(lw_bnd, up_bnd+1):
-        for x in A:
-            if (i - x) in H and i - x != x:
+        print(i)
+        for x in H:
+            if i - x in H and i - x != x:
                 pairs += 1
-                H[x] = x
                 break
-            else:
-                H[x] = x
     return pairs
 
 
@@ -33,8 +31,9 @@ if __name__ =="__main__":
     # Read the input
     stream_in = read_input(source)
 
-    pairs = compute_2sum(stream_in, -20, 0)
-
+    begin = time.time()
+    pairs = compute_2sum(stream_in, -10, 10)
+    print("2Sum ran in:", time.time() - begin, "seconds")
     print(pairs)
 
 
