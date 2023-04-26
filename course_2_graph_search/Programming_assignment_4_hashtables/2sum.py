@@ -1,6 +1,15 @@
+"""
+Computation of the number of integers within two bounds that have a 2 sum pair within a given list.
+Implemented using native python dict hashtable -- this is quite slow. As far as I'm aware this is about
+the best we can do in Python. The dict implementation is still light years faster than a naive list approach.
+"""
+
 import time
 
 def read_input(src : str):
+"""
+Read input txt file -- one integer per row.
+"""
     arr = []
     with open(src) as file:
         for l in file.readlines():
@@ -8,9 +17,13 @@ def read_input(src : str):
     return arr
 
 def compute_2sum(A : list, lw_bnd : int, up_bnd : int):
-
+"""
+Compute the number of integers within a lower and upper bound that have a 2sum pair in a given list of
+numbers. Implemented using a dict hashtable - for each entry, we try to lookup the corresponding entry
+for a 2 sum. 
+"""
     # Construct dict hash table
-    H = A
+    H = dict.fromkeys(A)
 
     pairs = 0
 
