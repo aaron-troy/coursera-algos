@@ -14,7 +14,6 @@ This approach  runs in Nlog(N), and is considerably faster than a naive, loop ba
 import time, heap
 import numpy as np
 
-
 def read_file(source : str):
     """
     Helper function for reading the input file, returned as an array

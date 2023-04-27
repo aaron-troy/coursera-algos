@@ -14,8 +14,6 @@ class Graph:
         self.verts = {}
         self.explored = {}
         self.num_verts = 0
-
-
     def get_vertices(self):
         return self.verts.keys()
 
