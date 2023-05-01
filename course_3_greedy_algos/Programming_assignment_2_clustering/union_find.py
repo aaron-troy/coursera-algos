@@ -1,0 +1,61 @@
+
+
+class UnionFind:
+    """
+    Union-find data structure. Implemented with lazy union by rank and path compression
+    """
+    def __init__(self):
+        self.parents = {}
+        self.ranks = {}
+        self.ids = {}
+
+    def add_member(self, member : int):
+        # Add member, given rank 0 and as its own parent
+        if member not in self.ids:
+            self.ids[member] = member
+            self.parents[member] = member
+            self.ranks[member] = 0
+
+    def find(self, member: int):
+        """
+        Recursively find the root, or oldest ancestor, of a member
+        """
+        if self.parents[member] == member:
+            return self.parents[member]
+        else:
+            return self.find(self.parents[member])
+
+    def path_compress(self, member, parent):
+        """
+        Connect a member and all ancestors to a new parent
+        """
+        while self.parents[member] != parent:
+            old_parent = self.parents[member]
+            self.parents[member] = parent
+            member = old_parent
+
+
+    def union(self, member_1: int, member_2: int):
+        """
+        Lazy union by rank with path compression. This refers to two specific optimizations
+            1. Union by rank: when combining sub-trees, the root with the greater maximum
+            steps to reach a leaf becomes the root of the resulting tree
+            2. Path compression: upon completing a union of two members, both members along with
+            the lower rank parent, take the remaining parent as their own. I.e. paths are compressed
+            directly to a single root.
+        """
+        # Get the current parents
+        parent_1 = self.find(member_1)
+        parent_2 = self.find(member_2)
+
+        # Maintain the root with the larger rank
+        if self.ranks[parent_1] >= self.ranks[parent_2]:
+            # Path compressed union
+            self.path_compress(member_2, parent_1)
+            # If the ranks are the same, increase the new parent's rank by 1
+            if self.ranks[parent_1] == self.ranks[parent_2]:
+                self.ranks[parent_1] += 1
+        else:
+            # Path compressed union
+            self.path_compress(member_1, parent_2)
+
