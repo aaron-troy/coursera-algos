@@ -25,6 +25,13 @@ def read_input(src : str):
     return inp
 
 def huffman_encode(weights: list):
+    """
+    Generate Huffman codes for symbols best on an input list of weights
+    Args:
+        weights: list, entry i is the weight / frequency of symbol i
+
+    Returns: dict of codes, key i has value of the code for symbol i
+    """
 
     # Initialize Huffman tree
     HT = hf.HuffmanTree()
@@ -37,7 +44,8 @@ def huffman_encode(weights: list):
     # Generate codes
     HT.generate_codes(HT.root)
 
-    # Return only codes for leaves
+    # Return only codes for leaves, corresponding to symbols in passed list.
+    # Non-leaf nodes correspond to parents created from merging nodes when building the tree.
     leaf_codes = {key : HT.codes[key] for key in HT.leaves}
 
     return leaf_codes
