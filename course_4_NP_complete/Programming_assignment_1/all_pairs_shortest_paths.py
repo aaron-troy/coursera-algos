@@ -69,6 +69,20 @@ class Graph:
         self.vertices[dest].add_in_edge(start, cost)
         self.num_edges += 1
 
+    def re_weight(self, W):
+        """
+        Re-weights edges to ensure non-negative values using computed vertex weightings
+
+        :param W: array, vertex weights computed as the minimum path lengths from a dummy node with o cost connection
+                  to all nodes.
+        :return: None
+        """
+        for u, u_vert in self.vertices.items():
+            for v, c_uv in u_vert.out_edges.items():
+                u_vert.out_edges[v] = c_uv + W[u] - W[v]
+                assert u_vert.out_edges[v] >= 0
+        return None
+
     def floyd_warshall(self):
         """
         Compute the length of the shortest path for all pairs of vertices in the input graph using the
@@ -152,47 +166,6 @@ class Graph:
                     print("Graph contains negative cycles, shortest path matrix undefined")
                     return None
         return A
-    """
-    def dijkstra(self, start):
-        
-        Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
-        :param start: int, start vertex
-        :return: dict, vertex:shortest path length from start
-        
-        explored = set()
-        explored.add(start)
-        D = {start: 0}
-        vert_set = set(self.vertices.keys())
-
-        # Initial heap populated with DGC and vert numbers stemming from the start node
-        H = heap.MinHeap()
-        for n, w in G.verts[start].neighbors.items():
-            H.insert(w, n)
-
-        while explored != vert_set:
-
-            # Get the root from the heap and add it to the explored set
-            min_dgc, add = H.pop_root()
-            if add not in explored:
-                D[add] = min_dgc
-                explored.add(add)
-
-            # Add new frontier DGCs to the heap
-            for n, w in G.verts[add].neighbors.items():
-                # If we've already explored here, move on
-                if n in explored:
-                    continue
-                elif n in H.val_arr:
-                    # If the new path is longer or equal to than an existing one, don't add it
-                    if min_dgc + w >= H.heap_arr[H.val_arr.index(n)]:
-                        continue
-                    else:
-                        H.delete(H.val_arr.index(n))
-                # Insert the new path length
-                H.insert(min_dgc + w, n)
-        return D
-
-"""
 
 
 if __name__ == "__main__":
@@ -202,6 +175,7 @@ if __name__ == "__main__":
     src_g2 = "g2.txt"
     src_g3 = "g3.txt"
 
+    """
     # Build the graph, src 1
     graph_src1 = read_input(src_g1)
     G1 = Graph()
@@ -213,7 +187,7 @@ if __name__ == "__main__":
 
     cProfile.run('G1.bellman_ford(1)')
 
-    """
+    
     # Build the graph, src 2
     graph_src2 = read_input(src_g2)
     G2 = Graph()
@@ -222,12 +196,13 @@ if __name__ == "__main__":
 
     # Run Floyd-Warshall algorithm
     cProfile.run('G2.floyd_warshall()')
-
+    """
     # Build the graph, src 3
     graph_src3 = read_input(src_g3)
     G3 = Graph()
     for start, dest, cost in graph_src3:
         G3.add_edge(start - 1, dest - 1, cost)
 
-    # Run Floyd-Warshall algorithm
-    cProfile.run('G3.floyd_warshall()')"""
+    W = G3.bellman_ford(1, re_weight=True)
+    G3.re_weight(W)
+    print('Done')
