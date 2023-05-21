@@ -1,5 +1,6 @@
 import numpy as np
 import cProfile
+import heap
 
 
 def read_input(src: str):
@@ -106,7 +107,7 @@ class Graph:
         print("Smallest minimum pair path:", A.min())
         return A
 
-    def bellman_ford(self, start, check_negative: bool = True):
+    def bellman_ford(self, start, check_negative: bool = True, re_weight: bool = False):
         """
         Bellman-Ford algorithm for computing the minimum path lengths from a single source.
 
@@ -119,15 +120,24 @@ class Graph:
         :param start: int, identifies the starting node
         :param check_negative: bool, optional. Triggers an additional iteration (checking with n edges) to test for
                any negative cycles, in which case the shortest paths are not well-defined. Default is True.
+        :param re_weight: bool, optional. Triggers the addition of dummy node which is used as the start. The returned
+               array then contains the vertex weights that allow re-weighting to remove negative edges in Johnson's
+               algo. Default is False.
         :return: None if negative cycles detected. Array with the shortest path lengths otherwise.
         """
 
-        # Set up array for storing path lengths
-        A = np.full(self.num_vertices, np.inf)
-        A[start] = 0
+        # Set up array for storing path lengths. If we want to re-weight, IC is a path length of zero to all nodes
+        # from the dummy node, max edges is n. Otherwise, IC is inf to all except the passed starting node, n-1.
+        if re_weight:
+            A = np.zeros(self.num_vertices)
+            max_edges = self.num_vertices
+        else:
+            A = np.full(self.num_vertices, np.inf)
+            A[start] = 0
+            max_edges = self.num_vertices - 1
 
-        # Iterate over the number of allowed edges, stopping at n-1
-        for i in range(1, self.num_vertices-1):
+        # Iterate over the number of allowed edges
+        for i in range(1, max_edges):
             # Check each vertex to see if there is a shorter path
             for v, v_vert in self.vertices.items():
                 min_in_edge = min([A[w] + cw for w, cw in v_vert.in_edges.items()])
@@ -141,10 +151,48 @@ class Graph:
                 if min_in_edge < A[v]:
                     print("Graph contains negative cycles, shortest path matrix undefined")
                     return None
-
         return A
+    """
+    def dijkstra(self, start):
+        
+        Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
+        :param start: int, start vertex
+        :return: dict, vertex:shortest path length from start
+        
+        explored = set()
+        explored.add(start)
+        D = {start: 0}
+        vert_set = set(self.vertices.keys())
 
+        # Initial heap populated with DGC and vert numbers stemming from the start node
+        H = heap.MinHeap()
+        for n, w in G.verts[start].neighbors.items():
+            H.insert(w, n)
 
+        while explored != vert_set:
+
+            # Get the root from the heap and add it to the explored set
+            min_dgc, add = H.pop_root()
+            if add not in explored:
+                D[add] = min_dgc
+                explored.add(add)
+
+            # Add new frontier DGCs to the heap
+            for n, w in G.verts[add].neighbors.items():
+                # If we've already explored here, move on
+                if n in explored:
+                    continue
+                elif n in H.val_arr:
+                    # If the new path is longer or equal to than an existing one, don't add it
+                    if min_dgc + w >= H.heap_arr[H.val_arr.index(n)]:
+                        continue
+                    else:
+                        H.delete(H.val_arr.index(n))
+                # Insert the new path length
+                H.insert(min_dgc + w, n)
+        return D
+
+"""
 
 
 if __name__ == "__main__":
