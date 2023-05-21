@@ -13,6 +13,7 @@ class Graph:
     def __init__(self):
         self.verts = {}
         self.explored = {}
+        self.edges = []
         self.num_verts = 0
         self.edge_sum = 0
     def get_vertices(self):
@@ -32,5 +33,6 @@ class Graph:
         self.verts[start].add_neighbor(end, weight)
         self.verts[end].add_neighbor(start, weight)
         self.edge_sum += weight
+        self.edges.append([start,end,weight])
 
 

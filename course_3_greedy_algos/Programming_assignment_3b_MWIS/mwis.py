@@ -75,7 +75,7 @@ if __name__ == "__main__":
     # Timing
     begin = time.time()
 
-    # Comput MWIS
+    # Compute MWIS
     mwis = compute_mwis(graph)
 
     print("MWIS computed in", time.time() - begin, "seconds")

@@ -40,21 +40,28 @@ class HuffmanTree:
         code: dictionary of codes produced by encoding
         min_heap: heap.MinHeap, useful for accelerating encoding by maintaining the minimum
         weight sub-tree
-        size: int, nnumber of nodes in the tree
+        size: int, number of nodes in the tree
         root: identifier for the root of the tree
     """
-    def __init__(self):
+    def __init__(self, queue: bool = False):
         """
         Constructor
         """
         self.nodes = {}
         self.leaves = {}
         self.codes = {}
-        self.min_heap = heap.MinHeap()
         self.size = 0
         self.root = None
 
-    def add_node(self, key, weight: int, leaf: bool = False):
+        # Use queues if desired. Default implementation uses a min-heap.
+        if queue:
+            self.Q1 = []
+            self.Q2 = []
+        else:
+            self.min_heap = heap.MinHeap()
+        self.use_queue = queue
+
+    def add_node(self, key, weight: int, is_leaf: bool = False):
         """
         Add a node for Huffman encoding. build_encoding must be called to form into tree
         Args:
@@ -65,12 +72,18 @@ class HuffmanTree:
         Returns: None
         """
         if key not in self.nodes:
+
             self.nodes[key] = HuffmanNode(key, weight)
-            self.min_heap.insert(weight, key)
             self.size += 1
             # Add to leaves if desired
-            if leaf:
+            if is_leaf:
                 self.leaves[key] = key
+            # Add entry to either the queue or min-heap, depending on how the tree was initialized.
+                if self.use_queue:
+                    self.Q1.append((weight, key))
+                    self.Q1.sort(key= lambda x: x[0])
+            if not self.use_queue:
+                self.min_heap.insert(weight, key)
 
     def build_encoding(self):
         """
@@ -82,18 +95,47 @@ class HuffmanTree:
 
         Returns: None
         """
+
         # Increment integers as identifiers
         i = max(self.nodes.keys())
-        while self.min_heap.heap_size > 1:
-            i += 1
-            # Get next two weights for the children
-            right_weight, right_child = self.min_heap.pop_root()
-            left_weight, left_child = self.min_heap.pop_root()
 
-            # Create a new node that is parent to the two lowest weight nodes in the heap
-            self.add_node(i, left_weight + right_weight)
-            self.nodes[i].right_child = right_child
-            self.nodes[i].left_child = left_child
+        if self.use_queue:
+            sel_queue = 2
+            while len(self.Q1) + len(self.Q2) > 1:
+                i += 1
+
+                if min(self.Q1, key= lambda x: x[0], default=(float("inf"), float("inf")))[0] < min(self.Q2,key= lambda x: x[0], default=(float("inf"),float("inf")))[0]:
+                    right_weight, right_child = self.Q1.pop(0)
+                else:
+                    right_weight, right_child = self.Q2.pop(0)
+                if min(self.Q1, key= lambda x: x[0], default=(float("inf"), float("inf")))[0] < min(self.Q2,key= lambda x: x[0], default=(float("inf"),float("inf")))[0]:
+                    left_weight, left_child = self.Q1.pop(0)
+                else:
+                    left_weight, left_child = self.Q2.pop(0)
+
+                self.add_node(i, left_weight + right_weight)
+                self.nodes[i].right_child = right_child
+                self.nodes[i].left_child = left_child
+
+                if sel_queue == 2:
+                    self.Q2.append(((left_weight + right_weight),i))
+                    if not self.Q1:
+                        sel_queue = 1
+                else:
+                    self.Q1.append(((left_weight + right_weight), i))
+                    if not self.Q1:
+                        sel_queue = 2
+        else:
+            while self.min_heap.heap_size > 1:
+                i += 1
+                # Get next two weights for the children
+                right_weight, right_child = self.min_heap.pop_root()
+                left_weight, left_child = self.min_heap.pop_root()
+
+                # Create a new node that is parent to the two lowest weight nodes in the heap
+                self.add_node(i, left_weight + right_weight)
+                self.nodes[i].right_child = right_child
+                self.nodes[i].left_child = left_child
 
         self.root = i
 

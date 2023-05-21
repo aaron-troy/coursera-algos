@@ -24,7 +24,7 @@ def read_input(src : str):
             inp.append(int(line))
     return inp
 
-def huffman_encode(weights: list):
+def huffman_encode(weights: list, use_queue: bool = False):
     """
     Generate Huffman codes for symbols best on an input list of weights
     Args:
@@ -34,9 +34,9 @@ def huffman_encode(weights: list):
     """
 
     # Initialize Huffman tree
-    HT = hf.HuffmanTree()
+    HT = hf.HuffmanTree(queue = use_queue)
     for i, w in enumerate(weights):
-        HT.add_node(i, w, leaf=True)
+        HT.add_node(i, w, is_leaf=True)
 
     # Build the encoding
     HT.build_encoding()
@@ -50,7 +50,6 @@ def huffman_encode(weights: list):
 
     return leaf_codes
 
-
 if __name__ == "__main__":
 
     # Source file for the input symbol weights
@@ -62,9 +61,19 @@ if __name__ == "__main__":
     # Timing
     begin = time.time()
 
-    # Generate Huffman tree
+    # Generate Huffman tree, first using min heap
     codes = huffman_encode(W)
 
-    print("Huffman coding ran in", time.time() - begin, "seconds")
+    print("Huffman coding ran in", time.time() - begin, "seconds using min heap")
+    print("Max code length:", max([len(c) for c in codes.values()]))
+    print("Min code length:", min([len(c) for c in codes.values()]))
+
+    # Timing
+    begin = time.time()
+
+    # Again, using queues
+    codes = huffman_encode(W, use_queue=True)
+
+    print("Huffman coding ran in", time.time() - begin, "seconds using regular queues")
     print("Max code length:", max([len(c) for c in codes.values()]))
     print("Min code length:", min([len(c) for c in codes.values()]))

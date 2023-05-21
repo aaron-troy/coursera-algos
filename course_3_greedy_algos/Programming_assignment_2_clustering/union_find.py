@@ -1,5 +1,4 @@
 
-
 class UnionFind:
     """
     Union-find data structure. Implemented with lazy union by rank and path compression

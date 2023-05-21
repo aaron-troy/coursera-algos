@@ -158,6 +158,7 @@ def most_common(arr : list, n : int = 5):
     cnt = Counter(arr)
     return cnt.most_common(n)
 
+
 def construct_graphs(input_file : str):
 
     # Initialize graph obejects for both the forward and reverse graphs
