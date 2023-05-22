@@ -1,6 +1,6 @@
 import numpy as np
 import cProfile
-import heap
+import heap, time
 
 
 def read_input(src: str):
@@ -43,6 +43,7 @@ class Graph:
         self.vertices = {}
         self.num_vertices = 0
         self.num_edges = 0
+        self.re_weighted = False
 
     def add_vertex(self, key):
         """
@@ -79,8 +80,12 @@ class Graph:
         """
         for u, u_vert in self.vertices.items():
             for v, c_uv in u_vert.out_edges.items():
+                v_vert = self.vertices[v]
                 u_vert.out_edges[v] = c_uv + W[u] - W[v]
-                assert u_vert.out_edges[v] >= 0
+                v_vert.in_edges[u] = c_uv + W[u] - W[v]
+
+        self.re_weighted = True
+
         return None
 
     def floyd_warshall(self):
@@ -94,6 +99,8 @@ class Graph:
         added vertex. Running time is O(V^3)
         :return: A, np array of all pairs of minimum path lengths
         """
+
+        print("Running Floyd-Warshall algo")
 
         # Initialize the output array with boundary conditions
         A = np.array([[np.inf] * self.num_vertices] * self.num_vertices)
@@ -110,6 +117,7 @@ class Graph:
 
         # Recurrence
         for k in vert_range:
+            print(k)
             for j in vert_range:
                 for i in vert_range:
                     # Update the best path length only if we do better be passing through the new vertex
@@ -118,6 +126,46 @@ class Graph:
                     if A[i, i] < 0:
                         print("Graph contains negative cycles, shortest path matrix undefined")
                         return None
+        print("Smallest minimum pair path:", A.min())
+        return A
+
+    def johnson(self):
+        """
+        Johnson's algo for the all-pairs shortest paths problem with negative edges.
+
+        Invokes the Bellman-Ford algorithm once to compute vertex weights. These are used to re-weight the edges,
+        removing any negative values.
+
+        Having removed negative edges, we call Dijkstra from each node. The final path lengths are then adjusted to
+        their true value by inverting the weighting operation
+
+        Running time is O(n^2log(n) + mn), the n calls to Dijkstra (nlog(n)) plus the single call the Bellman-Ford
+
+        :return: A, np.array with shortest path lengths
+        """
+
+        print("Running Johnson's algo")
+
+        # If not done already, re-weight to remove any negative edges
+        if not self.re_weighted:
+            print("Computing weights for re-weighting")
+            weights = self.bellman_ford(list(self.vertices.keys())[0], re_weight=True)
+            self.re_weight(weights)
+
+        # Initialize the output array with boundary conditions
+        A = np.full((self.num_vertices, self.num_vertices), np.inf)
+
+        # Having re-weighted, perform Dijkstra from each vertex
+        print("Finding shortest paths")
+        i = 0
+        for u in self.vertices:
+            print(i)
+            i += 1
+            A[u, :] = self.dijkstra(u)
+
+            # Adjust to the true lengths using the weights
+            A[u, :] = A[u, :] + weights - weights[u]
+
         print("Smallest minimum pair path:", A.min())
         return A
 
@@ -144,11 +192,12 @@ class Graph:
         # from the dummy node, max edges is n. Otherwise, IC is inf to all except the passed starting node, n-1.
         if re_weight:
             A = np.zeros(self.num_vertices)
-            max_edges = self.num_vertices
+            start = list(self.vertices.keys())[0]
         else:
             A = np.full(self.num_vertices, np.inf)
             A[start] = 0
-            max_edges = self.num_vertices - 1
+
+        max_edges = self.num_vertices
 
         # Iterate over the number of allowed edges
         for i in range(1, max_edges):
@@ -167,6 +216,46 @@ class Graph:
                     return None
         return A
 
+    def dijkstra(self, start):
+        """
+        Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
+        :param start: int, start vertex
+        :return: Array with the shortest path lengths
+        """
+
+        # Sets to keep track of what is explored and what isn't
+        explored = set()
+        explored.add(start)
+        vert_set = set(self.vertices.keys())
+
+        # Array for shortest paths, with appropriate ICs
+        A = np.full(self.num_vertices, np.inf)
+        A[start] = 0
+
+        # Initial heap populated with Dijkstra greedy criterion (DGC) and vert numbers stemming from the start node
+        H = heap.MinHeap()
+        for v, c_sv in self.vertices[start].out_edges.items():
+            H.insert(c_sv, v)
+
+        # Continue until everything is explored
+        while explored != vert_set:
+
+            # Get the root from the heap and add it to the explored set
+            min_dgc, add = H.pop_root()
+            if add not in explored:
+                A[add] = min_dgc
+                explored.add(add)
+
+            # Add new frontier DGCs to the heap
+            for u, c_u in self.vertices[add].out_edges.items():
+                # If we've already explored here, move on
+                if u in explored:
+                    continue
+
+                # Insert the new path length
+                H.insert(min_dgc + c_u, u)
+        return A
+
 
 if __name__ == "__main__":
 
@@ -174,8 +263,10 @@ if __name__ == "__main__":
     src_g1 = "g1.txt"
     src_g2 = "g2.txt"
     src_g3 = "g3.txt"
-
-    """
+    """ 
+    # ***** Both G1, G2 have negative cycles, so we'll skip these for comparing Johnson and Floyd-Warshall 
+    
+    
     # Build the graph, src 1
     graph_src1 = read_input(src_g1)
     G1 = Graph()
@@ -185,9 +276,6 @@ if __name__ == "__main__":
     # Run Floyd-Warshall algorithm
     #cProfile.run('G1.floyd_warshall()')
 
-    cProfile.run('G1.bellman_ford(1)')
-
-    
     # Build the graph, src 2
     graph_src2 = read_input(src_g2)
     G2 = Graph()
@@ -195,14 +283,20 @@ if __name__ == "__main__":
         G2.add_edge(start - 1, dest - 1, cost)
 
     # Run Floyd-Warshall algorithm
-    cProfile.run('G2.floyd_warshall()')
+    #cProfile.run('G2.floyd_warshall()')
     """
+
     # Build the graph, src 3
     graph_src3 = read_input(src_g3)
     G3 = Graph()
     for start, dest, cost in graph_src3:
         G3.add_edge(start - 1, dest - 1, cost)
 
-    W = G3.bellman_ford(1, re_weight=True)
-    G3.re_weight(W)
-    print('Done')
+    # Run FW with profiling
+    cProfile.run('G3.floyd_warshall()')
+
+    # Run Johnson with profiling
+    cProfile.run('G3.johnson()')
+
+
+
