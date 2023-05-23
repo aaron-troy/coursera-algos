@@ -6,9 +6,9 @@ Includes are two algorithms for solving this problem:
 2. Johnson's algorithm, a reduction of the problem to 1 call of the Bellman-Ford algorithm followed by n calls of
    Dijkstra's algorithm, running in O(n^2log(n) + mn)
 """
-
 import numpy as np
-import cProfile, heap
+import cProfile
+import heap
 
 def read_input(src: str):
     """
@@ -154,7 +154,6 @@ class Graph:
 
         # Recurrence
         for k in vert_range:
-            print(k)
             for j in vert_range:
                 for i in vert_range:
                     # Update the best path length only if we do better be passing through the new vertex
@@ -196,10 +195,7 @@ class Graph:
 
         # Having re-weighted, perform Dijkstra from each vertex
         print("Finding shortest paths")
-        i = 0
         for u in self.vertices:
-            print(i)
-            i += 1
             A[u, :] = self.dijkstra(u)
 
             # Adjust to the true lengths using the weights
