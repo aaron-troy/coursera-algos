@@ -1,44 +1,56 @@
 """
 Class for a min-heap data structure.
 
-This implementation maintains a min-heap with a single entry, a (key, ident) pair for each ident. ident is a unique
-identifier. Also maintained is dictionary with the current key for each ident for constant time look-up.
-
+This implementation maintains a min-heap with a single entry, a (weight, ident) pair for each ident. ident is a unique
+identifier. Also maintained is dictionary with the current weight for each ident for constant time look-up.
 """
 
 
 class MinHeap:
-
+    """
+    Mininmum heap class
+    """
     def __init__(self):
         """
         Constructor. Here heap is implemented using a list.
+
+        self.heap_arr -- array with the heap itself. Index 1 is the root, the minimum weight element
+        self.ident_arr -- array with identifiers for each entry. Value at index i has weight at index i in the heap
+        self.weight_dict -- dict with identifiers weighted to the corresponding weight in the heap. Useful for fast lookup
+        self.heap_size -- int, heap size
         """
         self.heap_arr = [0]
         self.ident_arr = [-1]
-        self.min_key_dict = {}
+        self.weight_dict = {}
         self.heap_size = 0
 
-    def insert(self, key, ident):
+    def insert(self, weight, ident):
         """
-        Insert an entry with identue key to the heap, maintain the heap structure
+        Insert an element into the heap. Sift up to maintain the min heap property
+        :param weight: weight to insert into heap
+        :param ident: unique, hashable identifier for element to insert
+        :return: None
         """
 
-        # Only add a key, ident to the heap if the new key is smaller or it's not in the heap already.
-        if key < self.min_key_dict.get(ident, float("inf")):
+        # Only add a weight, ident to the heap if the new weight is smaller or it's not in the heap already.
+        if weight < self.weight_dict.get(ident, float("inf")):
 
             # Append to the heap and identue arrays
-            self.heap_arr.append(key)
+            self.heap_arr.append(weight)
             self.ident_arr.append(ident)
-            # Update the min-key dict
-            self.min_key_dict[ident] = key
+            # Update the min-weight dict
+            self.weight_dict[ident] = weight
             # Update the size
             self.heap_size += 1
             # Sift upwards to maintain the heap property
             self.sift_up(self.heap_size)
+        return None
 
     def min_child(self, i):
         """
-        Return the minimum child for entry i, if it exists
+        Return minimum weight child for heap entry at index i.
+        :param i: int, index of parent in heap array
+        :return: int, index of the minimum child in the heap array
         """
         # Check there are children
         if 2 * i > self.heap_size:
@@ -57,6 +69,8 @@ class MinHeap:
     def parent(self, i):
         """
         Get the parent for heap entry i, if it exists
+        :param i: index of the child element in the heap array
+        :return: int, index of the parent element in the heap array
         """
         pt = int(i / 2)
         if pt == 0:
@@ -66,7 +80,9 @@ class MinHeap:
 
     def sift_up(self, i):
         """
-        Sift upwards starting at entry i to maintain the heap
+        Sift an element upwards until the heap property is restored
+        :param i: index of the element to sift upwards
+        :return: None
         """
         # Get the initial parent
         pt = self.parent(i)
@@ -80,10 +96,13 @@ class MinHeap:
             # Get the new parent
             i = pt
             pt = self.parent(pt)
+        return None
 
     def sift_down(self, i):
         """
-        Sift downwards, starting from entry i to maintain the heap structure
+        Sift an element downwards until the heap property is restored
+        :param i: index of the element to sift downwards
+        :return: None
         """
         # Get the min child of the starting node
         mc = self.min_child(i)
@@ -95,14 +114,17 @@ class MinHeap:
                 self.ident_arr[i], self.ident_arr[mc] = self.ident_arr[mc], self.ident_arr[i]
             i = mc
             mc = self.min_child(i)
+        return None
 
     def pop_root(self):
         """
-        Returns the minimum key and corresponding identue of the heap, dy definition the root.
+        Returns the minimum weight and corresponding identifier of the heap, by definition the root.
+        :return: (min_weight, min_ident) - min_weight - the weight of the entry at the root of the heap;
+                 min_ident: hashable identifier for the root element
         """
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum ident, stored at 1 index
-        min_key = self.heap_arr[1]
+        min_weight = self.heap_arr[1]
         min_ident = self.ident_arr[1]
 
         # Move the end entry to the root of the heap
@@ -118,7 +140,7 @@ class MinHeap:
         # Sift downwards to maintain the heap structure
         self.sift_down(1)
 
-        # Remove the entry from the min-key dict
-        self.min_key_dict.pop(min_ident)
+        # Remove the entry from the min-weight dict
+        self.weight_dict.pop(min_ident)
 
-        return min_key, min_ident
+        return min_weight, min_ident
