@@ -1,7 +1,14 @@
-import numpy as np
-import cProfile
-import heap, time
+"""
+Computing the shortest paths between all pairs of vertices/nodes in a directed, weighted graph real-valued edges.
 
+Includes are two algorithms for solving this problem:
+1. The Floyd-Warshall algorithm, a dynamic programming approach running in O(n^3)
+2. Johnson's algorithm, a reduction of the problem to 1 call of the Bellman-Ford algorithm followed by n calls of
+   Dijkstra's algorithm, running in O(n^2log(n) + mn)
+"""
+
+import numpy as np
+import cProfile, heap
 
 def read_input(src: str):
     """
@@ -10,8 +17,7 @@ def read_input(src: str):
     Args:
         src: str, file path for the input
 
-    Returns:
-
+    Returns: inp, array of the inputs
     """
     with open(src) as file:
         inp = []
@@ -21,18 +27,42 @@ def read_input(src: str):
 
 
 class Vertex:
+    """
+    Vertex class for constructing graphs
+    """
     def __init__(self, key):
+        """
+        Vertex class constructor
+        :param key: unique, hashable identifier for the vertex
+        """
         self.key = key
         self.out_edges = {}
         self.in_edges = {}
 
     def add_out_edge(self, dest, cost):
+        """
+        Add an out-going edge to the vertex
+        :param dest: hashable identifier for the edge destination
+        :param cost: edge weight
+        :return: None
+        """
         self.out_edges[dest] = cost
+        return None
 
     def add_in_edge(self, start, cost):
+        """
+        Add an incoming edge to the vertex
+        :param start: hashable identifier for the start of the incoming edge
+        :param cost: edge weight
+        :return: None
+        """
         self.in_edges[start] = cost
+        return None
 
 class Graph:
+    """
+    Class for directed, weighted graphs with real valued edges
+    """
     def __init__(self):
         """
         Graph class constructor.
@@ -48,11 +78,13 @@ class Graph:
     def add_vertex(self, key):
         """
         Add a vertex to the graph
-        :param key: key, a unique, hashable identifier for the vertex
+        :param key: unique, hashable identifier for the vertex
+        :return: None
         """
         if key not in self.vertices:
             self.vertices[key] = Vertex(key)
             self.num_vertices += 1
+        return None
 
     def add_edge(self, start, dest, cost):
         """
@@ -60,6 +92,7 @@ class Graph:
         :param start: unique, hashable identifier of for the edge start vertex
         :param dest: unique, hashable identifier of for the edge end vertex
         :param cost: cost for the edge
+        :return: None
         """
         if start not in self.vertices:
             self.add_vertex(start)
@@ -69,6 +102,8 @@ class Graph:
         self.vertices[start].add_out_edge(dest, cost)
         self.vertices[dest].add_in_edge(start, cost)
         self.num_edges += 1
+
+        return None
 
     def re_weight(self, W):
         """
@@ -96,7 +131,9 @@ class Graph:
 
         We exploit the fact that each time a vertex is added, the shortest path between every pair is
         either the existing path length, or the sum of two optimal sub-paths passing through the newly
-        added vertex. Running time is O(V^3)
+        added vertex. Negative cycles are detected of the fly by checking for negative path lengths from
+        any vertex to itself. Computation is terminated upon finding a negative cycle as shortest paths are undefined.
+        Running time is O(V^3)
         :return: A, np array of all pairs of minimum path lengths
         """
 
@@ -123,10 +160,12 @@ class Graph:
                     # Update the best path length only if we do better be passing through the new vertex
                     if (A[j, k] + A[k, i]) < A[j, i]:
                         A[j, i] = (A[j, k] + A[k, i])
+                    # Check for negative cycles
                     if A[i, i] < 0:
                         print("Graph contains negative cycles, shortest path matrix undefined")
                         return None
         print("Smallest minimum pair path:", A.min())
+
         return A
 
     def johnson(self):
@@ -141,7 +180,7 @@ class Graph:
 
         Running time is O(n^2log(n) + mn), the n calls to Dijkstra (nlog(n)) plus the single call the Bellman-Ford
 
-        :return: A, np.array with shortest path lengths
+        :return: A, np.array with the shortest path lengths
         """
 
         print("Running Johnson's algo")
@@ -218,7 +257,12 @@ class Graph:
 
     def dijkstra(self, start):
         """
-        Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
+        Min heap based implementation of Dijkstra's algorithm for an undirected graph. Runs in O(nlog(n)). The graph
+        must contain no negative edges for the routine to yield a correct result. If negative edges are present, the
+        graph must first be re-weighted.
+
+        Running time is O(nlog(n))
+
         :param start: int, start vertex
         :return: Array with the shortest path lengths
         """
@@ -242,6 +286,7 @@ class Graph:
 
             # Get the root from the heap and add it to the explored set
             min_dgc, add = H.pop_root()
+
             if add not in explored:
                 A[add] = min_dgc
                 explored.add(add)
