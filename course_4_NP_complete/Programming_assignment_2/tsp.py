@@ -1,5 +1,6 @@
 import numpy as np
 import itertools
+from decimal import *
 import cProfile
 
 def read_input(src: str):
@@ -13,7 +14,7 @@ def read_input(src: str):
     """
     with open(src) as file:
         inp = []
-        for line in file.readlines()[1:]:
+        for line in file.readlines():
             inp.append([float(i) for i in line.split()])
     return inp
 
@@ -50,8 +51,8 @@ def tsp_dynamic(D):
     i = 1
     # Iterate over possible cardinalities
     for SS_C in subsets:
-        print(i / len(subsets))
         i += 1
+        print(i / len(subsets))
         # Iterate over subsets with a given cardinality
         for S in SS_C:
             # Get array index for the subset
@@ -70,11 +71,13 @@ def tsp_dynamic(D):
 
 if __name__ == "__main__":
 
-    tsp_g = read_input("tsp.txt")
+    tsp_g = read_input("tsp_26_dist.txt")
 
-    dist_matrix = compute_dist_matrix(tsp_g)
+    dist_matrix = np.array(tsp_g)
 
-    cProfile.run('tsp_dynamic(dist_matrix)')
+    #dist_matrix = np.array([[0, 10,15, 20], [10, 0, 25, 25], [15, 25, 0, 30], [20, 25, 30, 0]])
+
+    tsp_dynamic(dist_matrix)
 
 
 
