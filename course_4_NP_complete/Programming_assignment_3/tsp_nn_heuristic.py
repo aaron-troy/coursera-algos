@@ -12,8 +12,8 @@ def read_input(src: str):
     """
     with open(src) as file:
         inp = []
-        for line in file.readlines()[1:10000]:
-            inp.append([float(i) for i in line.split()[1:]])
+        for line in file.readlines()[1:]:
+            inp.append([float(i) for i in line.split()])
     return inp
 
 def compute_sqr_dist_matrix(g):
@@ -22,12 +22,18 @@ def compute_sqr_dist_matrix(g):
     """
     D = np.zeros((len(g), len(g)))
     for i in range(len(g)):
-
         for j in range(len(g)):
             D[i, j] = ((g[i][0] - g[j][0])**2 + (g[i][1] - g[j][1])**2)
     return D
 
 def tsp_nn_heuristic(D):
+    """
+    Estimate the cost of the TSP problem using the nearest neighbor heuristic.
+    Args:
+        D: 2D np.array, squared Euclidean distance between each pair of cities/
+
+    Returns: float, cost of the TSP
+    """
 
     cost = 0
     i = k = 0
@@ -37,21 +43,23 @@ def tsp_nn_heuristic(D):
     visited = set([i])
 
     while visited != verts:
+        # Compute distance to NN that is unvisited
         dist = min(D[i, ~np.isin(np.arange(len(D)), list(visited))])
-        j = np.argwhere(D[i, :] == dist)[k][0]
-        while j in visited:
-            k += 1
-            j = np.argwhere(D[i, :] == dist)[k][0]
-        k = 0
-        cost += dist
+        # Get the index for nearest neighbour not yet visited
+        j = np.argwhere((D[i, :] * ~np.isin(np.arange(len(D)), list(visited))) == dist)[0][0]
+
+        # Add the cost, Euclidean distance
+        cost += np.sqrt(dist)
+
+        # Add to the visited set
         visited.add(j)
         i = j
 
-        visit_count = + 1
+        visit_count += 1
         print(visit_count)
 
-    cost += D[i, 0]
-    cost = np.sqrt(cost)
+    # Cost of returning home
+    cost += np.sqrt(D[i, 0])
 
     print('Total cost:', cost)
 
