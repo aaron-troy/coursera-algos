@@ -5,35 +5,39 @@ the best we can do in Python. The dict implementation is still light years faste
 """
 
 import time
-
 def read_input(src : str):
-"""
-Read input txt file -- one integer per row.
-"""
+    """
+    Read input txt file -- one integer per row.
+    :param src: path to input file
+    :return: list of numbers from input file
+    """
     arr = []
     with open(src) as file:
         for l in file.readlines():
             arr.append(int(l))
     return arr
 
-def compute_2sum(A : list, lw_bnd : int, up_bnd : int):
-"""
-Compute the number of integers within a lower and upper bound that have a 2sum pair in a given list of
-numbers. Implemented using a dict hashtable - for each entry, we try to lookup the corresponding entry
-for a 2 sum. 
-"""
+def compute_2sum(a: list, lw_bnd: int, up_bnd: int):
+    """
+    Compute the number of integers within a lower and upper bound that have a 2sum pair in a given list of
+    numbers. Implemented using a dict hashtable - for each entry, we try to lookup the corresponding entry
+    for a 2 sum.
+    :param a: list of entries to compute 2sum pairs for
+    :param lw_bnd: lower bound for 2sum range
+    :param up_bnd: upper bound for 2sum range
+    :return: number of pairs
+    """
     # Construct dict hash table
-    H = dict.fromkeys(A)
-
-    pairs = 0
+    h = dict.fromkeys(a)
+    num_of_pairs = 0
 
     for i in range(lw_bnd, up_bnd+1):
         print(i)
-        for x in H:
-            if i - x in H and i - x != x:
-                pairs += 1
+        for x in h:
+            if i - x in h and i - x != x:
+                num_of_pairs += 1
                 break
-    return pairs
+    return num_of_pairs
 
 
 if __name__ =="__main__":
