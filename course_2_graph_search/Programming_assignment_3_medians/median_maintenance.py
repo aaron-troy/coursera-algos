@@ -14,17 +14,19 @@ This approach  runs in Nlog(N), and is considerably faster than a naive, loop ba
 import time, heap
 import numpy as np
 
-def read_file(source : str):
+def read_file(src: str):
     """
     Helper function for reading the input file, returned as an array
+    :param src: file path to input file
+    :return: list of input numbers
     """
     arr = []
-    with open(source) as file:
+    with open(src) as file:
         for l in file.readlines():
             arr.append(int(l))
     return arr
 
-def get_median_stream(arr : list):
+def get_median_stream(arr: list):
     """
     Produce a stream of median values using min heap and max heap data structures
     :param arr: Input array
@@ -32,56 +34,56 @@ def get_median_stream(arr : list):
     M[1] is the median value of arr[0:2], M[2] --> arr[0:3], etc.
     """
     # Min and max heaps. Max heap has the smaller half of numbers seen so far, min heap the rest
-    H_low = heap.MaxHeap()
-    H_high = heap.MinHeap()
+    h_low = heap.MaxHeap()
+    h_high = heap.MinHeap()
 
-    M = [arr[0]]
+    m = [arr[0]]
 
     # Start with the lower heap larger
-    H_low.insert(arr[0])
+    h_low.insert(arr[0])
 
     for a in arr[1:]:
         # If the heaps aren't the same size, we need to add to the higher one, a min heap
-        if H_low.heap_size > H_high.heap_size:
+        if h_low.heap_size > h_high.heap_size:
             # If the entry to add is larger the high heap's root, just add it
-            if a >= H_low.heap_arr[1]:
-                H_high.insert(a)
+            if a >= h_low.heap_arr[1]:
+                h_high.insert(a)
             # Otherwise, transfer the root from the lower heap, add to the lower heap
             else:
-                H_high.insert(H_low.pop_root())
-                H_low.insert(a)
+                h_high.insert(h_low.pop_root())
+                h_low.insert(a)
             # Computer median. Number seen so far is even.
-            M.append((H_low.heap_arr[1]+H_high.heap_arr[1]) / 2)
+            m.append((h_low.heap_arr[1]+h_high.heap_arr[1]) / 2)
         else:
-            # Choose where to add, leaving the lower heap larfer
-            if a > H_high.heap_arr[1]:
-                H_low.insert(H_high.pop_root())
-                H_high.insert(a)
+            # Choose where to add, leaving the lower heap larger
+            if a > h_high.heap_arr[1]:
+                h_low.insert(h_high.pop_root())
+                h_high.insert(a)
             else:
-                H_low.insert(a)
+                h_low.insert(a)
             # Computer median. Number seen so far is odd.
-            M.append(H_low.heap_arr[1])
-    return M
+            m.append(h_low.heap_arr[1])
+    return m
 
-if __name__ =="__main__":
+if __name__ == "__main__":
 
     # Source file for the input graph
     source = "Median.txt"
-    # Build the graph
-    G = read_file(source)
+    # Read the input stream of numbers
+    input_stream = read_file(source)
 
     # Timing
     begin = time.time()
-    medians = get_median_stream(G)
-    print("Heap based median stream compute in", time.time() - begin, "seconds")
+    medians = get_median_stream(input_stream)
+    print("Heap based median stream computed in", time.time() - begin, "seconds")
     # Sum, modulo 10000, for Coursera assignment
     print(sum(medians) % 10000)
 
     np_medians = []
     begin = time.time()
-    for i in range(1,len(G)):
-        np_medians.append(np.median(G[0:i]))
-    np_medians.append(np.median(G))
+    for i in range(1,len(input_stream)):
+        np_medians.append(np.median(input_stream[0:i]))
+    np_medians.append(np.median(input_stream))
     print("Numpy based median stream computed in", time.time() - begin, "seconds")
     print((sum(np_medians)) % 10000)
 
