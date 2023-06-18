@@ -7,80 +7,81 @@ The heap-based implementation uses a heap data structure, implemented as its own
 """
 
 import time, heap, graphs
-def heap_dijkstra(G : graphs.Graph(), start : int):
+def heap_dijkstra(g:graphs.Graph(), start: int):
     """
     Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
-    :param G: Graph object, undirected weighted graph
+    :param g: Graph object, undirected weighted graph
     :param start: int, start vertex
     :return: dict, vertex:shortest path length from start
     """
     explored = set()
     explored.add(start)
-    D = {start:0}
-    vert_set = set(G.get_vertices())
+    d = {start: 0}
+    vert_set = set(g.get_vertices())
 
     # Initial heap populated with DGC and vert numbers stemming from the start node
-    H = heap.MinHeap()
-    for n, w in G.verts[start].neighbors.items():
-        H.insert(w, n)
+    h = heap.MinHeap()
+    for n, w in g.verts[start].neighbors.items():
+        h.insert(w, n)
 
     while explored != vert_set:
 
-        # Get the root from the heap and add it to the explored set
-        min_dgc, add = H.pop_root()
-        if add not in explored:
-            D[add] = min_dgc
-            explored.add(add)
+        # Get the root value and key from the heap and add it to the explored set
+        min_dgc, add_key = h.pop_root()
+        if add_key not in explored:
+            d[add_key] = min_dgc
+            explored.add(add_key)
 
         # Add new frontier DGCs to the heap
-        for n, w in G.verts[add].neighbors.items():
+        for n, w in g.verts[add_key].neighbors.items():
             # If we've already explored here, move on
             if n in explored:
                 continue
-            elif n in H.val_arr:
+            elif n in h.val_arr:
                 # If the new path is longer or equal to than an existing one, don't add it
-                if min_dgc + w >= H.heap_arr[H.val_arr.index(n)]:
+                if min_dgc + w >= h.heap_arr[h.val_arr.index(n)]:
                     continue
                 else:
-                    H.delete(H.val_arr.index(n))
+                    h.delete(h.val_arr.index(n))
             # Insert the new path length
-            H.insert(min_dgc + w, n)
-    return D
+            h.insert(min_dgc + w, n)
+    return d
 
-def naive_dijkstra(G : graphs.Graph(), start : int):
+def naive_dijkstra(g: graphs.Graph(), start: int):
     """
     Naive implementation of Dijkstra's algorithm, without using a heap. Runs in O(m * n) time.
-    :param G: input graph, Graph object
+    :param g: input graph, Graph object
     :param start: int, key for start vertex
     :return: dict, vertex : shortest path length from start
     """
     explored = set()
     explored.add(start)
-    G.verts[start].explored = True
-    D = {start:0}
+    g.verts[start].explored = True
+    d = {start: 0}
+    add_key = start
 
     # Loop until we've explored all nodes
-    while explored != set(G.get_vertices()):
+    while explored != set(g.get_vertices()):
         # Initial value for minimum Dijkstra's  greedy criterion (DGC)
         min_dgc = float('inf')
         # Check all edges from explored to unexplored nodes
         for node in explored:
-            frontier = G.verts[node].neighbors
+            frontier = g.verts[node].neighbors
             for n, w in frontier.items():
                 # Compute DGC. Update if it's smaller
-                if not G.verts[n].explored:
-                    dgc = D[node] + w
+                if not g.verts[n].explored:
+                    dgc = d[node] + w
                     if dgc < min_dgc:
                         min_dgc = dgc
-                        add = n
+                        add_key = n
         # Expand the explored set and shortest distances
-        G.verts[add].explored = True
-        explored.add(add)
-        D[add] = min_dgc
+        g.verts[add_key].explored = True
+        explored.add(add_key)
+        d[add_key] = min_dgc
 
-    return D
+    return d
 
-def build_graph(source : str):
+def build_graph(source: str):
     """
     Build an undirected weighted graph. Input is a text file. Single digits represent source
     vertices, while tuple represent neighbors and the edge weight. E.g. "1  2,10    3,20" is
@@ -106,29 +107,31 @@ def build_graph(source : str):
             # Add the connections
             for e in arr[shift:]:
                 end, weight = int(e.split(',')[0]), int(e.split(',')[1])
-                graph.add_edge(start, end, weight)
+                graph.add_edge(start, end, weight=weight)
     return graph
 
-if __name__ =="__main__":
+
+if __name__ == "__main__":
     # Timing
     begin = time.time()
 
     # Source file for the input graph
     source = "dijkstraData.txt"
     # Build the graph
-    G = build_graph(source)
+    input_graph = build_graph(source)
     print('Graph constructed in', time.time() - begin, "seconds.")
 
     # Timing
     begin = time.time()
 
     # Compute shortest path lengths using naive Dijkstra implementation
-    distances_naive = naive_dijkstra(G, 1)
+    distances_naive = naive_dijkstra(input_graph, 1)
     print("Naive Dijkstra ran in", time.time() - begin, "seconds")
 
     # Vertices of interest, for the course assignment
     verts_of_interest = [7, 37, 59, 82, 99, 115, 133, 165, 188, 197]
     dists_of_interest = []
+
     for v in verts_of_interest:
         dists_of_interest.append(distances_naive[v])
     print(dists_of_interest)
@@ -137,12 +140,12 @@ if __name__ =="__main__":
     begin = time.time()
 
     # Compute shortest path lengths using heap Dijkstra implementation
-    distances_heap = heap_dijkstra(G, 1)
+    distances_from_heap = heap_dijkstra(input_graph, 1)
     print("Heap Dijkstra ran in", time.time() - begin, "seconds")
     dists_of_interest = []
     # Vertices of interest, for the course assignment
     for v in verts_of_interest:
-        dists_of_interest.append(distances_heap[v])
+        dists_of_interest.append(distances_from_heap[v])
     print(dists_of_interest)
 
 
