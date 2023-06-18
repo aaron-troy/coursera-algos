@@ -1,11 +1,12 @@
-"""
-Class for a min-heap data structure
-"""
-class MinHeap:
 
+class MinHeap:
+    """
+    Class for a min-heap data structure
+    """
     def __init__(self):
         """
-        Constructor. Here heap is implemented using a list.
+        Constructor. Here heap is implemented using a list. Arrays start from index 1, for numerical
+        simplicity in the sifting operations
         """
         self.heap_arr = [0]
         self.val_arr = [0]
@@ -14,6 +15,9 @@ class MinHeap:
     def insert(self, key, val):
         """
         Insert an entry with value key to the heap, maintain the heap structure
+        :param key: unique, hashable key for positioning the heap
+        :param val: value associated with the key in the heap
+        :return: None
         """
         # Append to the heap and value arrays
         self.heap_arr.append(key)
@@ -23,10 +27,13 @@ class MinHeap:
         # Sift upwards to maintain the heap property
         self.sift_up(self.heap_size)
 
+        return None
+
     def delete(self, key):
         """
         Delete an entry with arbitrary position from the heap
-        :param key: heap key to delete
+        :param key: key of heap entry to delete
+        :return: None
         """
         # Move replace the entry to delete with the last entry of the heap
         if key == self.heap_size:
@@ -45,13 +52,16 @@ class MinHeap:
                 self.sift_up(key)
             else:
                 self.sift_down(key)
+        return None
 
 
-    def min_child(self, i):
+    def min_child(self, i: int):
         """
         Return the minimum child for entry i, if it exists
+        :param i: Heap array index of entry to find the min child for
+        :return: Heap array index of the minimum child of the entry at i
         """
-        # Check there are children
+        # Check if there are children
         if 2 * i > self.heap_size:
             return None
         # Check if there is more than one
@@ -64,18 +74,22 @@ class MinHeap:
             else:
                 return 2 * i + 1
 
-    def parent(self, i):
+    def parent(self, i: int):
         """
-        Get the parent for heap entry i, if it exists
+        Get the parent of the entry at index i in the heap array, if it exists.
+        :param i: index of the entry in the heap array to find the parent for
+        :return: index of the parent in the heap array, if it exists.
         """
         pt = int(i / 2)
         if pt == 0:
             return None
         else:
             return pt
-    def sift_up(self, i):
+    def sift_up(self, i: int):
         """
-        Sift upwards starting at entry i to maintain the heap
+        Sift upwards starting at index i in the heap array to maintain the heap
+        :param i: index in the heap array to sift upwards from
+        :return: None
         """
         # Get the initial parent
         pt = self.parent(i)
@@ -89,10 +103,13 @@ class MinHeap:
             # Get the new parent
             i = pt
             pt = self.parent(pt)
+        return None
 
-    def sift_down(self, i):
+    def sift_down(self, i: int):
         """
-        Sift downwards, starting from entry i to maintain the heap structure
+        Sift downwards, starting from index i in the heap array to maintain the heap structure
+        :param i: index in the heap array to sift downwards from
+        :return: None
         """
         # Get the min child of the starting node
         mc = self.min_child(i)
@@ -104,10 +121,12 @@ class MinHeap:
                 self.val_arr[i], self.val_arr[mc] = self.val_arr[mc], self.val_arr[i]
             i = mc
             mc = self.min_child(i)
+        return None
 
     def pop_root(self):
         """
-        Returns the minimum key and corresponding value of the heap, dy definition the root.
+        Returns the minimum key and corresponding value of the heap, by definition the root.
+        :return: key and value for the entry at the heap root
         """
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum val, stored at 1 index
