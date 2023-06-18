@@ -81,9 +81,9 @@ if __name__ == "__main__":
 
     np_medians = []
     begin = time.time()
-    for i in range(1,len(input_stream)):
+    for i in range(1, len(input_stream)):
         np_medians.append(np.median(input_stream[0:i]))
     np_medians.append(np.median(input_stream))
     print("Numpy based median stream computed in", time.time() - begin, "seconds")
-    print((sum(np_medians)) % 10000)
+    print(sum(np_medians) % 10000)
 
