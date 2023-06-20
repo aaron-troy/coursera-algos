@@ -11,12 +11,17 @@ import graphs
 import heap
 import union_find
 
-def read_file(source : str):
+def read_file(src: str):
     """
     Helper function for reading the input file, returned as an array
+    Args:
+        src: file path for input
+
+    Returns: list, adjacency list from the input
+
     """
     arr = []
-    with open(source) as file:
+    with open(src) as file:
         arr = []
         for line in file.readlines()[1:]:
             arr.append([int(i) for i in line.split()])
@@ -26,13 +31,17 @@ def read_file(source : str):
 def build_graph(adj_list: list):
     """
     Helper function that builds a graph object from an adjacency list
-    """
-    G = graphs.Graph()
-    for x,y,w in adj_list:
-        G.add_edge(x,y,w)
-    return G
+    Args:
+        adj_list:
 
-def Prim_MST(G : graphs.Graph):
+    Returns: Graph object constructed from adjacency list
+    """
+    graph_out = graphs.Graph()
+    for x, y, w in adj_list:
+        graph_out.add_edge(x, y, w)
+    return graph_out
+
+def prims_mst(graph_in: graphs.Graph):
     """
     Compute the minimum spanning tree (MST) for an input undirected graph using Prim's greedy algo.
     Implemented using min-heap data structure. At each step, edges crossing the frontier from explored
@@ -44,31 +53,31 @@ def Prim_MST(G : graphs.Graph):
     contain redundant edges as a consequence.
     """
     # Initialize heap for frontier edges and get the start vertex
-    H = heap.MinHeap()
-    current = next(iter(G.get_vertices()))
+    h = heap.MinHeap()
+    current = next(iter(graph_in.get_vertices()))
     # Use a graph object for the output
-    T = graphs.Graph()
+    tree_out = graphs.Graph()
 
     # Add edges from the start to the heap
-    for vert, weight in G.verts[current].neighbors.items():
-        H.insert(weight, (current, vert))
+    for vert, weight in graph_in.verts[current].neighbors.items():
+        h.insert(weight, (current, vert))
 
     # Continue while T does not span G
-    while T.get_vertices() != G.get_vertices():
+    while tree_out.get_vertices() != graph_in.get_vertices():
 
         # Get the next minimum cost edge from the heap
-        weight, (start, nxt) = H.pop_root()
+        weight, (start, nxt) = h.pop_root()
 
         # If the edge goes somewhere unexplored, add it to the MST
-        if nxt not in T.verts:
-            T.add_edge(start, nxt, weight)
+        if nxt not in tree_out.verts:
+            tree_out.add_edge(start, nxt, weight)
             # Add new frontier edges to the heap.
-            for add, add_weight in G.verts[nxt].neighbors.items():
-                if add not in T.verts:
-                    H.insert(add_weight, (nxt, add))
-    return T
+            for add, add_weight in graph_in.verts[nxt].neighbors.items():
+                if add not in tree_out.verts:
+                    h.insert(add_weight, (nxt, add))
+    return tree_out
 
-def Kruskal_MST(G : graphs.Graph):
+def kruskal_mst(graph_in: graphs.Graph):
     """
     Compute the minimum spanning tree (MST) for an input undirected graph using Kruskal's greedy algo
     -- an alternative to Prim's above. Implemented using union-find data structure. In this approach,
@@ -80,31 +89,30 @@ def Kruskal_MST(G : graphs.Graph):
     """
 
     # Get a list of edges and sort
-    edges = sorted(G.edges, key= lambda x: x[2])
+    edges = sorted(graph_in.edges, key= lambda x: x[2])
 
     # Use a graph object for the MST
-    T = graphs.Graph()
+    tree_out = graphs.Graph()
 
     # Union-find object to accelerate Kruskal
-    U = union_find.UnionFind()
+    mst_uf = union_find.UnionFind()
     for m1, m2, _ in edges:
-        U.add_member(m1)
-        U.add_member(m2)
+        mst_uf.add_member(m1)
+        mst_uf.add_member(m2)
 
     # Continue merging parents until we span the graph
-    while len(set(U.parents.values())) > 1:
+    while len(set(mst_uf.parents.values())) > 1:
         # Take the cheapest edge
         if len(edges) < 1:
-            print('Graph is not connected. MST not possible')
             break
         start, end, cost = edges.pop(0)
         # If the edge connects distinct subtrees, and thus doesn't induce a cycle, add it to the MST
-        if U.find(start) != U.find(end):
-            T.add_edge(start, end, cost)
+        if mst_uf.find(start) != mst_uf.find(end):
+            tree_out.add_edge(start, end, cost)
             # Update the union-find
-            U.union(start, end)
+            mst_uf.union(start, end)
 
-    return T
+    return tree_out
 
 
 
@@ -113,25 +121,25 @@ if __name__ == "__main__":
     # Source file for the input graph
     source = "Prims_input.txt"
     # Build the graph
-    G = build_graph(read_file(source))
+    g = build_graph(read_file(source))
 
     # Timing
     begin = time.time()
 
     # Compute MST, first using Prim's algorithm
-    MST_Prims = Prim_MST(G)
+    mst_prims = prims_mst(g)
 
     print("Prim's MST ran in", time.time() - begin, "seconds")
-    print("MST cost:", MST_Prims.edge_sum)
+    print("MST cost:", mst_prims.edge_sum)
 
     # Re-build the graph to recompute the MST using Kruskal's algorithm
-    G = build_graph(read_file(source))
+    g = build_graph(read_file(source))
 
     # Timing
     begin = time.time()
 
     # Compute MST again, this time using Kruskal's algorithm
-    MST_Kruskal = Kruskal_MST(G)
+    mst_kruskal = kruskal_mst(g)
 
     print("Kruskal's MST ran in", time.time() - begin, "seconds")
-    print("MST cost:", MST_Kruskal.edge_sum)
+    print("MST cost:", mst_kruskal.edge_sum)
