@@ -13,7 +13,7 @@ def read_input(src: str):
     with open(src) as file:
         inp = []
         for line in file.readlines()[1:]:
-            inp.append([float(i) for i in line.split()])
+            inp.append([float(i) for i in line.split()[1:]])
     return inp
 
 def compute_sqr_dist_matrix(g):
