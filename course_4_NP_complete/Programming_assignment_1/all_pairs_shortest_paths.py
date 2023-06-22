@@ -8,7 +8,7 @@ Includes are two algorithms for solving this problem:
 """
 import numpy as np
 import cProfile
-import heap
+from data_structures import heap
 
 def read_input(src: str):
     """
