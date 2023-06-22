@@ -25,31 +25,33 @@ def read_input(src : str):
             inp.append(int(line))
     return inp
 
-def huffman_encode(weights: list, use_queue: bool = False):
+def huffman_encode(weights: list, use_queue: bool=False):
     """
     Generate Huffman codes for symbols best on an input list of weights
     Args:
         weights: list, entry i is the weight / frequency of symbol i
+        use_queue: bool, flag to use std queue data structure as opposed to heaps
 
     Returns: dict of codes, key i has value of the code for symbol i
     """
 
     # Initialize Huffman tree
-    HT = hf.HuffmanTree(queue = use_queue)
+    ht = hf.HuffmanTree(queue=use_queue)
     for i, w in enumerate(weights):
-        HT.add_node(i, w, is_leaf=True)
+        ht.add_node(i, w, is_leaf=True)
 
     # Build the encoding
-    HT.build_encoding()
+    ht.build_encoding()
 
     # Generate codes
-    HT.generate_codes(HT.root)
+    ht.generate_codes(ht.root)
 
     # Return only codes for leaves, corresponding to symbols in passed list.
     # Non-leaf nodes correspond to parents created from merging nodes when building the tree.
-    leaf_codes = {key : HT.codes[key] for key in HT.leaves}
+    leaf_codes = {key : ht.codes[key] for key in ht.leaves}
 
     return leaf_codes
+
 
 if __name__ == "__main__":
 
