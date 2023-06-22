@@ -18,6 +18,11 @@ def read_hamming_graph(src: str):
     Helper function to read in the graph. Input a text file. The first row is two numbers, the
     number of graph members and bits for each member's location. Subsequent rows are binary strings
     for each member's location.
+    Args:
+        src: file path for the input file
+
+    Returns:
+        nodes: list of binary strings for each member's location
     """
     with open(src) as file:
         nodes = []
@@ -27,10 +32,16 @@ def read_hamming_graph(src: str):
             i += 1
     return nodes
 
-def generate_neighborhood(member_dict: dict, home: str, min_hd: int=1):
+def generate_neighborhood(member_dict: dict, home: str, ndh_hd: int = 1):
     """
-    Helper function that checks the graph for all possible members within a given Hamming distance
-    of a home member. Returns a list of neighbors meeting this criteria
+    Create a neighbourhood around a home member of a specified hamming distance size
+    Args:
+        member_dict: dictionary of all members
+        home: id of home member to compute generate the neighbourhood around
+        ndh_hd: neighbourhood Hamming distance, optional, default 1 bit
+
+    Returns:
+        neighborhood: list of neighbours around home within the specified Hamming distance
     """
     # Home member should be in the graph and of non-zero length
     assert home in member_dict
@@ -41,7 +52,7 @@ def generate_neighborhood(member_dict: dict, home: str, min_hd: int=1):
 
     neighborhood = []
     # Search the neighborhood within the given Hamming distance
-    for i in range(1, min_hd + 1):
+    for i in range(1, ndh_hd + 1):
         # Try all possible combinations of differences
         for comb in itertools.combinations(bit_idxs, i):
             add = list(home)
@@ -55,51 +66,57 @@ def generate_neighborhood(member_dict: dict, home: str, min_hd: int=1):
     return neighborhood
 
 
-def max_clusters_hamming(G : list, min_spacing :int = 3):
+def max_clusters_hamming(members_in: list, min_spacing: int = 3):
     """
     Computes the maximum number of clusters in a graph that will preserve a passed minimum
     spacing between clusters. Employs a distributed greedy approach and union-find data structure.
 
-    For each member, we check all possible members within the mimimum distance. If they are in the
+    For each member, we check all possible members within the minimum distance. If they are in the
     graph, perform a union. This approach avoids computing all pairwise distances followed by sorting,
     which is not feasible for an input of this size.
+    Args:
+        members_in: list of binary strings giving each member's location
+        min_spacing: minimum difference between all pairs between all clusters
+
+    Returns:
+        int, number of clusters required to achieve the passed minimum spacing
     """
     # Generate a copy of the graph to allow mutation
-    members = G.copy()
+    members = members_in.copy()
 
     # Set up union-find
-    U = union_find.UnionFind()
+    uf = union_find.UnionFind()
     for member in members:
-        U.add_member(member)
+        uf.add_member(member)
 
     # Check the neighborhood with min sizing around all members. If there are neighbors,
     # perform a union.
     while members:
         m = members.pop()
-        N = generate_neighborhood(U.ids, m, min_spacing - 1)
-        for n in N:
-            if U.find(n) != U.find(m):
-                U.union(m, n)
+        nbh = generate_neighborhood(uf.ids, m, min_spacing - 1)
+        for n in nbh:
+            if uf.find(n) != uf.find(m):
+                uf.union(m, n)
     # Enforce path compression
-    for m in U.parents:
-        U.parents[m] = U.find(m)
+    for m in uf.parents:
+        uf.parents[m] = uf.find(m)
 
     # Return the number of clusters
-    return len(set(U.parents.values()))
+    return len(set(uf.parents.values()))
 
 if __name__ == "__main__":
 
     # Source file for the input graph
     source = "clustering_big.txt"
 
-    # Build the graph
-    G = read_hamming_graph(source)
+    # Read the input hamming list
+    hamming_list_in = read_hamming_graph(source)
 
     # Timing
     begin = time.time()
 
     # Run k-means clustering based on Hamming distance
-    max_k = max_clusters_hamming(G, min_spacing=MIN_SPACE)
+    max_k = max_clusters_hamming(hamming_list_in, min_spacing=MIN_SPACE)
 
     print("KM clustering ran in", time.time() - begin, "seconds")
     print("The max number of clusters is", max_k, "for a minimum spacing of H = ", MIN_SPACE)
