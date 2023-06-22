@@ -67,34 +67,34 @@ def max_knapsack_value_recurse(items: dict, W: int, end, sols: dict = {}):
         sols[(W, end)] = max(case_1, case_2)
     return sols
 
-def max_knapsack_value_iter(items: dict, W: int):
+def max_knapsack_value_iter(items: dict, w: int):
     """
     Compute the maximum attainable knapsack value for a list of items and maximum capacity using an iterative
     dynamic programming approach.
     Args:
         items: dict of lists, each key maps to a list with an item value and weight as entries 0 and 1
-        W: int, maximum knapsack capacity
+        w: int, maximum knapsack capacity
 
     Returns: max_val, int. the maximum knapsack value attainable
     """
     # Knapsack sizes; start from the smallest item
-    sizes = list(range(W))
+    sizes = list(range(w))
     # Empty array to populate
-    A = [[0] * len(sizes)]
+    arr = [[0] * len(sizes)]
     keys = list(items.keys())
     keys.sort()
     for k in keys:
         value, weight = items[k]
-        S = []
+        s = []
         for j in range(len(sizes)):
             if weight > sizes[j]:
-                S.append(A[k-1][j])
+                s.append(arr[k-1][j])
             else:
-                S.append(max(A[k-1][j], (A[k-1][sizes[j] - weight] + value)))
-        A.append(S)
-    return A[-1][-1]
+                s.append(max(arr[k-1][j], (arr[k-1][sizes[j] - weight] + value)))
+        arr.append(s)
+    return arr[-1][-1]
 
-def threaded_knapsack(inputs : dict, W: int):
+def threaded_knapsack(inputs: dict, W: int):
     """
     Separate function for running the recursive solution on a custom thread with increased stack size.
     """
