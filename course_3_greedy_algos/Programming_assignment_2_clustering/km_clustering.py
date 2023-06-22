@@ -8,7 +8,6 @@
  and maintain this while we merge sub-trees through Kruskals algorithm. This is achieved by the union-find
  data structure.
 
-
  In this data structure, each member maintains a pointer to its parent.
 """
 
@@ -16,39 +15,55 @@ import time
 import union_find
 
 def read_graph(src: str):
+    """
+    Read the input txt file
+    Args:
+        src: file path for the input
+
+    Returns: list, adjacency list
+    """
     with open(src) as file:
         edges = []
         for line in file.readlines()[1:]:
             edges.append([int(i) for i in line.split()])
     return edges
 
-def km_cluster(G : list, num_clusters: int):
+def km_cluster(graph_in: list, num_clusters: int):
+    """
+    Conduct k-means clustering of an input graph formatted as an adjacency list using Kruskal's algorithm
+    implemented with a union-find data structure. Returns the maximum spacing for the resulting clustering
+    Args:
+        graph_in: list, weight adjacency list for the input graph
+        num_clusters: number of clusters to compute
 
+    Returns: maximum spacing from the resulting clustering. False if no clustering possible.
+
+    """
     # Get a list of edges, sorted by increasing distance
-    edges = sorted(G, key= lambda x: x[2])
+    edges = sorted(graph_in, key= lambda x: x[2])
 
     # Setup union-find
-    U = union_find.UnionFind()
+    uf = union_find.UnionFind()
     for m1, m2, _ in edges:
-        U.add_member(m1)
-        U.add_member(m2)
+        uf.add_member(m1)
+        uf.add_member(m2)
 
     # Keep track of the number of merges
     merges = 0
 
-    while merges < len(U.ids) - num_clusters:
+    while merges < len(uf.ids) - num_clusters:
         # Pop lowest remaining distance
         start, end, distance = edges.pop(0)
 
         # If the edge isn't from within a cluster, merge the clusters
-        if U.find(start) != U.find(end):
-            U.union(start, end)
+        if uf.find(start) != uf.find(end):
+            uf.union(start, end)
             merges += 1
 
-    # Get the maximum spacing
+    # Get the maximum spacing from the remaining edges
     while len(edges) > 0:
         start, end, spacing = edges.pop(0)
-        if U.find(start) != U.find(end):
+        if uf.find(start) != uf.find(end):
             return spacing
 
     # Return false if there is no max spacing
@@ -60,13 +75,13 @@ if __name__ == "__main__":
     source = "clustering1.txt"
 
     # Build the graph
-    G = read_graph(source)
+    input_adj_list = read_graph(source)
 
     # Timing
     begin = time.time()
 
     # Run k-means clustering
-    max_spacing = km_cluster(G, 4)
+    max_spacing = km_cluster(input_adj_list, 4)
 
     print("KM clustering ran in", time.time() - begin, "seconds")
     print("Max spacing:", max_spacing)
