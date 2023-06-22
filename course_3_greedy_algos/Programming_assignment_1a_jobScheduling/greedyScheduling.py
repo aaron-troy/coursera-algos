@@ -2,21 +2,23 @@
 Greedy algorithms for scheduling a list of input tasks, each with an associated weight and length.
 """
 import time
-def read_file(source : str):
+def read_file(src : str):
     """
-    Helper function for reading the input file, returned as a dict unique ids to job weights and lengths.
-    The input is a text file, with the first line containing the number of jobs.
-    Each subsequent line has 2 integers, corresponding the job weight and length.
+    Helper function to read input file for job scheduling. Input is txt file, first row contains the number of jobs,
+    subsequent rows have a job weight and length
+    Args:
+        src: file path for the input file
+    Returns: dict, job ID as key to a list with weight and length as entries
     """
-    D = {}
-    with open(source) as file:
+    d = {}
+    with open(src) as file:
         i = 0
         for l in file.readlines()[1:]:
-            D[i] = [int(j) for j in l.split()]
+            d[i] = [int(j) for j in l.split()]
             i += 1
-    return D
+    return d
 
-def greedy_difference_schedule(J : dict):
+def greedy_difference_schedule(jobs: dict):
     """
     Implementation of greedy scheduling algorithm, scheduling based on difference between task
     weight and length. Computes the total weighted completion time for the resulting schedule.
@@ -24,36 +26,36 @@ def greedy_difference_schedule(J : dict):
     """
     # Assemble a list of tuples, sorted by decreasing difference, then weight
     sch = []
-    for i, (w,l) in J.items():
-        sch.append((i,w,l,w-l))
+    for i, (w, l) in jobs.items():
+        sch.append((i, w, l, w-l))
     sch_sorted = sorted(sch, key=lambda x: (-x[3], -x[1]))
 
     # Compute the total weighted completion time
-    compTimes = []
+    comp_times = []
     t = 0
     for i, w, l, _ in sch_sorted:
-        compTimes.append(w * (l + t))
+        comp_times.append(w * (l + t))
         t += l
-    return sum(compTimes)
+    return sum(comp_times)
 
-def greedy_quotient_schedule(J : dict):
+def greedy_quotient_schedule(jobs: dict):
     """
     Implementation of greedy scheduling algorithm, scheduling based on decreasing weight / lenght quotient
     Computes the total weighted completion time for the resulting schedule. Result is not optimal.
     """
     # Assemble a list of tuples, sorted by decreasing difference, then weight
     sch = []
-    for i, (w, l) in J.items():
+    for i, (w, l) in jobs.items():
         sch.append((i, w, l, w / l))
     sch_sorted = sorted(sch, key=lambda x: (-x[3]))
 
     # Compute the total weighted completion time
-    compTimes = []
+    comp_times = []
     t = 0
     for i, w, l, _ in sch_sorted:
-        compTimes.append(w * (l + t))
+        comp_times.append(w * (l + t))
         t += l
-    return sum(compTimes)
+    return sum(comp_times)
 
 
 if __name__ =="__main__":

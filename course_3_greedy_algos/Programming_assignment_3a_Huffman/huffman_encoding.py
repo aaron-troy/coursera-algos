@@ -6,7 +6,8 @@ specialization by Tim Roughgarden
 """
 
 import time
-import huffman as hf
+from data_structures import huffman as hf
+
 
 def read_input(src : str):
     """

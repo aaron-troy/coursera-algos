@@ -7,9 +7,8 @@ achieve O(mlog(n)) running time.
 """
 
 import time
-import graphs
-import heap
-import union_find
+from data_structures import graphs, union_find, heap
+
 
 def read_file(src: str):
     """
@@ -17,8 +16,8 @@ def read_file(src: str):
     Args:
         src: file path for input
 
-    Returns: list, adjacency list from the input
-
+    Returns:
+        arr: list, adjacency list from the input
     """
     arr = []
     with open(src) as file:
@@ -34,7 +33,8 @@ def build_graph(adj_list: list):
     Args:
         adj_list:
 
-    Returns: Graph object constructed from adjacency list
+    Returns:
+        graph_out: Graph object constructed from adjacency list
     """
     graph_out = graphs.Graph()
     for x, y, w in adj_list:

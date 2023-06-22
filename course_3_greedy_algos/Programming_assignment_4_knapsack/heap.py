@@ -5,15 +5,20 @@ class MinHeap:
 
     def __init__(self):
         """
-        Constructor. Here heap is implemented using a list.
+        Constructor. Here heap is implemented using a list. Indexed from 1 for numerical simplicity in the sifting operations
         """
         self.heap_arr = [0]
-        self.val_arr = [(0,0)]
+        self.val_arr = [(0, 0)]
         self.heap_size = 0
 
     def insert(self, key, val):
         """
-        Insert an entry with value key to the heap, maintain the heap structure
+        Insert an entry with (key and value) into the heap, maintain the heap structure
+        Args:
+            key: key for the heap entry, determines position in the heap
+            val: val tied to the key
+
+        Returns: None
         """
         # Append to the heap and value arrays
         self.heap_arr.append(key)
@@ -23,9 +28,15 @@ class MinHeap:
         # Sift upwards to maintain the heap property
         self.sift_up(self.heap_size)
 
+        return None
+
     def min_child(self, i):
         """
-        Return the minimum child for entry i, if it exists
+        Return the minimum child for entry at index i in the heap array, if it exists
+        Args:
+            i: index in heap array of the entry to find the minimum child for, if it exists
+
+        Returns: index in heap array of minimum child
         """
         # Check there are children
         if 2 * i > self.heap_size:
@@ -40,9 +51,15 @@ class MinHeap:
             else:
                 return 2 * i + 1
 
+
     def parent(self, i):
         """
         Get the parent for heap entry i, if it exists
+        Args:
+            i: index in heap array of the entry to find the minimum child for, if it exists
+
+        Returns:
+            pt: index of parent in heap array, None if no parent exist
         """
         pt = int(i / 2)
         if pt == 0:
@@ -51,7 +68,12 @@ class MinHeap:
             return pt
     def sift_up(self, i):
         """
-        Sift upwards starting at entry i to maintain the heap
+        Sift upwards from index i to maintain the heap
+        Args:
+            i: index in the heap array to sift upwards from
+
+        Returns:
+            None
         """
         # Get the initial parent
         pt = self.parent(i)
@@ -65,10 +87,16 @@ class MinHeap:
             # Get the new parent
             i = pt
             pt = self.parent(pt)
+        return None
 
     def sift_down(self, i):
         """
         Sift downwards, starting from entry i to maintain the heap structure
+        Args:
+            i: index in the heap array to sift downwards from
+
+        Returns:
+            None
         """
         # Get the min child of the starting node
         mc = self.min_child(i)
@@ -80,10 +108,13 @@ class MinHeap:
                 self.val_arr[i], self.val_arr[mc] = self.val_arr[mc], self.val_arr[i]
             i = mc
             mc = self.min_child(i)
+        return None
 
     def pop_root(self):
         """
         Returns the minimum key and corresponding value of the heap, dy definition the root.
+
+        Returns: (key, value) for the root
         """
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum val, stored at 1 index
