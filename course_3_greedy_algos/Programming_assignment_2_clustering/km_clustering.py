@@ -12,7 +12,7 @@
 """
 
 import time
-import union_find
+from data_structures import union_find
 
 def read_graph(src: str):
     """

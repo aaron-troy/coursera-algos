@@ -7,7 +7,7 @@ Implementation makes use of the union-find data structure, with lazy union-by-ra
 """
 
 import time
-import union_find
+from data_structures import union_find
 import itertools
 
 # Minimum spacing to compute the max number of clusters for
