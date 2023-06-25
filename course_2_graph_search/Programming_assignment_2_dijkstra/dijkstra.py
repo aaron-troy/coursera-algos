@@ -7,12 +7,15 @@ The heap-based implementation uses a heap data structure, implemented as its own
 """
 
 import time, heap, graphs
-def heap_dijkstra(g:graphs.Graph(), start: int):
+def heap_dijkstra(g: graphs.Graph(), start: int):
     """
-    Heap based implementation of Dijkstra for an undirected graph. Runs in O(nlog(n))
-    :param g: Graph object, undirected weighted graph
-    :param start: int, start vertex
-    :return: dict, vertex:shortest path length from start
+    Min-heap based implementation of Dijkstra. Runs in O(nlog(n)) time
+
+    Args:
+        g: Graph object, undirected weighted graph
+        start: int, start vertex identifier
+    Returns:
+        d: dict, vertex ID keyed to shortest path length from start
     """
     explored = set()
     explored.add(start)
@@ -50,9 +53,13 @@ def heap_dijkstra(g:graphs.Graph(), start: int):
 def naive_dijkstra(g: graphs.Graph(), start: int):
     """
     Naive implementation of Dijkstra's algorithm, without using a heap. Runs in O(m * n) time.
-    :param g: input graph, Graph object
-    :param start: int, key for start vertex
-    :return: dict, vertex : shortest path length from start
+
+    Args:
+        g: input graph, Graph object
+        start: int, start vertex identifier
+
+    Returns:
+        d: dict, vertex ID keyed to shortest path length from start
     """
     explored = set()
     explored.add(start)
@@ -81,18 +88,22 @@ def naive_dijkstra(g: graphs.Graph(), start: int):
 
     return d
 
-def build_graph(source: str):
+def build_graph(src: str):
     """
     Build an undirected weighted graph. Input is a text file. Single digits represent source
     vertices, while tuple represent neighbors and the edge weight. E.g. "1  2,10    3,20" is
     a three node graph with an edge of length 10 between 1 and 2, and an edge of length 20 between
     1 and 3.
-    :param source: string to the input file path
-    :return: Graph class object
+
+    Args:
+        source: string to the input file path
+
+    Returns:
+        graph_out: graphs.Graph class object constructed from the input file
     """
     graph = graphs.Graph()
 
-    with open(source) as file:
+    with open(src) as file:
         start = None
         # Read line-by-line
         for l in file.readlines():
