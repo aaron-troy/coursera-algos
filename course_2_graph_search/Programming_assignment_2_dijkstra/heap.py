@@ -15,9 +15,13 @@ class MinHeap:
     def insert(self, key, val):
         """
         Insert an entry with value key to the heap, maintain the heap structure
-        :param key: unique, hashable key for positioning the heap
-        :param val: value associated with the key in the heap
-        :return: None
+
+        Args:
+            key: unique, hashable key for positioning the heap
+            val: value associated with the key in the heap
+
+        Returns:
+            None
         """
         # Append to the heap and value arrays
         self.heap_arr.append(key)
@@ -32,8 +36,12 @@ class MinHeap:
     def delete(self, key):
         """
         Delete an entry with arbitrary position from the heap
-        :param key: key of heap entry to delete
-        :return: None
+
+        Args:
+            key: key of heap entry to delete
+
+        Returns:
+            None
         """
         # Move replace the entry to delete with the last entry of the heap
         if key == self.heap_size:
@@ -58,8 +66,12 @@ class MinHeap:
     def min_child(self, i: int):
         """
         Return the minimum child for entry i, if it exists
-        :param i: Heap array index of entry to find the min child for
-        :return: Heap array index of the minimum child of the entry at i
+
+           Args:
+            i: Heap array index of entry to find the min child for
+
+        Returns:
+            int, Heap array index of the minimum child of the entry at i. None  if no children
         """
         # Check if there are children
         if 2 * i > self.heap_size:
@@ -77,8 +89,12 @@ class MinHeap:
     def parent(self, i: int):
         """
         Get the parent of the entry at index i in the heap array, if it exists.
-        :param i: index of the entry in the heap array to find the parent for
-        :return: index of the parent in the heap array, if it exists.
+
+        Args:
+            i: index of the entry in the heap array to find the parent for
+
+        Returns:
+            pt: int, index of the parent in the heap array, if it exists. None otherwise
         """
         pt = int(i / 2)
         if pt == 0:
@@ -88,8 +104,12 @@ class MinHeap:
     def sift_up(self, i: int):
         """
         Sift upwards starting at index i in the heap array to maintain the heap
-        :param i: index in the heap array to sift upwards from
-        :return: None
+
+        Args:
+            i: int, index in the heap array to sift upwards from
+
+        Returns:
+            None
         """
         # Get the initial parent
         pt = self.parent(i)
@@ -108,8 +128,12 @@ class MinHeap:
     def sift_down(self, i: int):
         """
         Sift downwards, starting from index i in the heap array to maintain the heap structure
-        :param i: index in the heap array to sift downwards from
-        :return: None
+
+        Args:
+            i: int, index in the heap array to sift downwards from
+
+        Returns:
+            None
         """
         # Get the min child of the starting node
         mc = self.min_child(i)
@@ -126,7 +150,10 @@ class MinHeap:
     def pop_root(self):
         """
         Returns the minimum key and corresponding value of the heap, by definition the root.
-        :return: key and value for the entry at the heap root
+
+        Returns:
+            (min_key, min_val): (key, value) for the root of the heap, key being the minimum currently
+            in the heap
         """
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum val, stored at 1 index
