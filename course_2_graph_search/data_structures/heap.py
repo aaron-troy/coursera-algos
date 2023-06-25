@@ -43,7 +43,7 @@ class MinHeap:
         Returns:
             None
         """
-        # Move replace the entry to delete with the last entry of the heap
+        # Replace the entry to delete with the last entry of the heap
         if key == self.heap_size:
             return
         self.heap_arr[key] = self.heap_arr[self.heap_size]
