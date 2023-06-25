@@ -11,8 +11,9 @@ invariants, along with those of a min and max heap, it follows that the median a
 This approach  runs in Nlog(N), and is considerably faster than a naive, loop based approach.
 """
 
-import time, heap
+import time
 import numpy as np
+from data_structures import heap
 
 def read_file(src: str):
     """
@@ -50,14 +51,14 @@ def get_median_stream(arr: list):
                 h_high.insert(a)
             # Otherwise, transfer the root from the lower heap, add to the lower heap
             else:
-                h_high.insert(h_low.pop_root())
+                h_high.insert(h_low.pop_root()[0])
                 h_low.insert(a)
             # Computer median. Number seen so far is even.
-            m.append((h_low.heap_arr[1]+h_high.heap_arr[1]) / 2)
+            m.append((h_low.heap_arr[1] + h_high.heap_arr[1]) / 2)
         else:
             # Choose where to add, leaving the lower heap larger
             if a > h_high.heap_arr[1]:
-                h_low.insert(h_high.pop_root())
+                h_low.insert(h_high.pop_root()[0])
                 h_high.insert(a)
             else:
                 h_low.insert(a)
