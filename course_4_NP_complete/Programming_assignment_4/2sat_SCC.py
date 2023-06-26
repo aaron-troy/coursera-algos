@@ -21,24 +21,28 @@ def build_implication_graphs(edg_list: list, reverse=False):
     """
     Build an implication graph from a list of input constraints for 2sat problem. For each constraint, two edges are
     added. One for A' -> B, another for B' -> A
-    :param edg_list: list of lists. Each entry is a list with the two boolean values for the constraint
-    :param reverse: Boolean flag for produce a graph with reversed edges. Optional, default False
-    :return: Graph object
+
+    Args:
+        edg_list: list of lists. Each entry is a list with the two boolean values for the constraint
+        reverse: Boolean flag for produce a graph with reversed edges. Optional, default False
+
+    Returns:
+        graph_out: graphs.Graph object constructed from the input
     """
-    G = graphs.Graph()
+    graph_out = graphs.Graph()
 
     if reverse:
         for e in edg_list:
-            G.add_edge(e[1], -e[0])
-            G.add_edge(e[0], -e[1])
+            graph_out.add_edge(e[1], -e[0])
+            graph_out.add_edge(e[0], -e[1])
     else:
         for e in edg_list:
-            G.add_edge(-e[0], e[1])
-            G.add_edge(-e[1], e[0])
-    return G
+            graph_out.add_edge(-e[0], e[1])
+            graph_out.add_edge(-e[1], e[0])
+    return graph_out
 
 
-def kosaraju(G: graphs.Graph, G_rev: graphs.Graph):
+def kosaraju(g_fw: graphs.Graph, g_rev: graphs.Graph):
     """
     Run Kosaraju's algorithm to compute the strongly connected components in a direct graph.
 
@@ -47,36 +51,42 @@ def kosaraju(G: graphs.Graph, G_rev: graphs.Graph):
     the second DFS, keep track of the DFS source, assigning this as the leader to each node explored. Vertices in a
     SCC will have the same leader
 
-    :param G: Graph object, forward edges
-    :param G_rev: Graph object, reverse edges
-    :return: None
+    Args:
+        g_fw: Graph object, forward edges
+        g_rev: Graph object, reverse edges
+
+    Returns:
+        None
     """
     # Run the DFS loop over the graph
     print('DFS reverse graph')
-    DFS_loop(G_rev)
+    dfs_loop(g_rev)
 
     # Get the finishing order from the first DFS pass. Use this in descending
     # order as the search order for the second DFS pass
-    search_order = [-1] * G_rev.num_verts
-    for n in G_rev.verts:
-        search_order[G_rev.verts[n].order] = n
+    search_order = [-1] * g_rev.num_verts
+    for n in g_rev.verts:
+        search_order[g_rev.verts[n].order] = n
     search_order.reverse()
 
     # Run DFS again on the forward graph, using the finishing time as the start vertex order
     print('DFS forward graph')
-    DFS_loop(G, order=search_order)
+    dfs_loop(g_fw, order=search_order)
 
     return None
 
 
-def DFS_loop(G: graphs.Graph, order: list = []):
+def dfs_loop(g_in: graphs.Graph, order: list = []):
     """
+     DFS loop to intiate DFS from every node, to ensure full exploration
 
-    :param G: Graph object to perform DFS on
-    :param order: Order of vertices to initiate DFS from. Used during 2nd pass of Kosaraju's algo
-    :return: None
+    Args:
+        g_in: graphs.Graph object to perform DFS on
+        order: list, order in which to initiate the DFS. Optional
+
+    Returns:
+        None
     """
-
     # Global variables for the explored vertices count and the current source vertex
     global exp_cnt, source
 
@@ -88,23 +98,27 @@ def DFS_loop(G: graphs.Graph, order: list = []):
 
     # If no search order was passed, just get the vertices
     if not order:
-        order = G.get_vertices()
+        order = g_in.get_vertices()
 
     # Try DFS from all vertices to ensure everything gets explored
     for n in order:
         # If a vertex is not explored, begin DFS
-        if not G.verts[n].explored:
+        if not g_in.verts[n].explored:
 
             source = n
             # DFS
-            _ = DFS(G.verts[n])
+            _ = dfs(g_in.verts[n])
     return None
 
-def DFS(start: graphs.Vertex):
+def dfs(start: graphs.Vertex):
     """
     Perform DFS on directed graph from a starting Vertex object. Implemented using stack.
-    :param start: Vertex object to start the DFS from
-    :return: None
+
+    Args:
+        start:  Vertex object to start the DFS from
+
+    Returns:
+        None
     """
     # Global variables for the explored vertices count and the current source vertex
     global exp_cnt, source
@@ -139,15 +153,19 @@ def DFS(start: graphs.Vertex):
             stack.pop()
     return None
 
-def check_2sat(G: graphs.Graph):
+def check_2sat(g_in: graphs.Graph):
     """
     Check whether a 2 sat instance represented as an implication graph is satisfiable. A graph is unsatisfiable, iff
     X and X` are contained in the same strongly connected component of the implication graph.
-    :param G: Graph object, implication graph of 2 sat instance. Must have leaders identified for each vertex.
-    :return: None
+
+    Args:
+        g_in: Graph object, implication graph of 2 sat instance. Must have leaders identified for each vertex.
+
+    Returns:
+        None
     """
-    leaders = G.get_leaders()
-    vert_list = list(G.verts.keys())
+    leaders = g_in.get_leaders()
+    vert_list = list(g_in.verts.keys())
 
     if None in leaders.values():
         print('Missing leaders in graph! SCCs undefined.')
