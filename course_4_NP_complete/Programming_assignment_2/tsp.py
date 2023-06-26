@@ -1,6 +1,5 @@
 import numpy as np
 import itertools
-from decimal import *
 import cProfile
 
 def read_input(src: str):
@@ -14,45 +13,49 @@ def read_input(src: str):
     """
     with open(src) as file:
         inp = []
-        for line in file.readlines():
+        for line in file.readlines()[1:]:
             inp.append([float(i) for i in line.split()])
     return inp
 
 def compute_dist_matrix(g):
     """
     Compute a matrix of Euclidean distances between all vertices
-    :param g: list, input list of vertex coordinates
-    :return: D, 2D np array of distances
-    """
 
-    D = np.zeros((len(g), len(g)))
+    Args:
+        g:  list, input list of vertex coordinates
+
+    Returns:
+        d: 2D np array of distances
+    """
+    d = np.zeros((len(g), len(g)))
     for i in range(len(g)):
         for j in range(len(g)):
-            D[i, j] = D[j, i] = np.sqrt((g[i][0] - g[j][0])**2 + (g[i][1] - g[j][1])**2)
-    return D
+            d[i, j] = d[j, i] = np.sqrt((g[i][0] - g[j][0])**2 + (g[i][1] - g[j][1])**2)
+    return d
 
-def tsp_dynamic(D):
+def tsp_dynamic(d):
     """
     Compute the minimum cost solution to the TSP problem given a distance matrix using a dynamic programming approach
-    :param D: 2D nxn np array of distances between n nodes
-    :return: float, cost of minimum cost tour
-    """
 
+    Args:
+        d: np.array, 2D nxn np array of distances between n nodes
+
+    Returns:
+        tsp_sol, float, cost of minimum cost tour
+    """
     # Generate all possible subsets for each cardinality. Use frozenset so objects are hashable
-    subsets = [[frozenset(s).union(frozenset([1])) for s in itertools.combinations(list(range(2, D.shape[0]+1)), n)] for n in range(1, D.shape[0])]
+    subsets = [[frozenset(s).union(frozenset([1])) for s in itertools.combinations(list(range(2, d.shape[0] + 1)), n)] for n in range(1, d.shape[0])]
     subsets_flat = [frozenset([1])] + [item for sublist in subsets for item in sublist]
 
     # Dictionary for looking up the index of a given subset
     ss_dict = {subsets_flat[i]: i for i in range(len(subsets_flat))}
 
     # Array for storing recurrence results
-    A = np.full((len(ss_dict), D.shape[0]), np.inf)
-    A[0, 0] = 0
+    a = np.full((len(ss_dict), d.shape[0]), np.inf)
+    a[0, 0] = 0
     i = 1
     # Iterate over possible cardinalities
     for SS_C in subsets:
-        i += 1
-        print(i / len(subsets))
         # Iterate over subsets with a given cardinality
         for S in SS_C:
             # Get array index for the subset
@@ -62,22 +65,20 @@ def tsp_dynamic(D):
                 # Get array index of the set with j absent
                 s_j_ = ss_dict[S - {j}]
                 # Compute minimum path to add
-                A[s_j, j-1] = min([A[s_j_, k-1] + D[k-1, j-1] for k in S - {j}])
+                a[s_j, j-1] = min([a[s_j_, k-1] + d[k - 1, j - 1] for k in S - {j}])
 
     # Compute the minimum cost by adding the final edge back to home
-    tsp_sol = min([A[-1, i] + D[0, i] for i in range(1, D.shape[0])])
+    tsp_sol = min([a[-1, i] + d[0, i] for i in range(1, d.shape[0])])
     print('Minimum cost solution:', tsp_sol)
     return tsp_sol
 
 if __name__ == "__main__":
 
-    tsp_g = read_input("tsp_26_dist.txt")
+    tsp_g = read_input("tsp.txt")
 
-    dist_matrix = np.array(tsp_g)
+    dist_matrix = compute_dist_matrix(tsp_g)
 
-    #dist_matrix = np.array([[0, 10,15, 20], [10, 0, 25, 25], [15, 25, 0, 30], [20, 25, 30, 0]])
-
-    tsp_dynamic(dist_matrix)
+    cProfile.run('tsp_dynamic(dist_matrix)')
 
 
 
