@@ -18,8 +18,12 @@ from data_structures import heap
 def read_file(src: str):
     """
     Helper function for reading the input file, returned as an array
-    :param src: file path to input file
-    :return: list of input numbers
+
+    Args:
+        src: string, file path to input file
+
+    Returns:
+        arr: list with numbers from input
     """
     arr = []
     with open(src) as file:
@@ -30,9 +34,14 @@ def read_file(src: str):
 def get_median_stream(arr: list):
     """
     Produce a stream of median values using min heap and max heap data structures
-    :param arr: Input array
-    :return: M, stream of medians. I.e. M[0] is the median of arr[0],
-    M[1] is the median value of arr[0:2], M[2] --> arr[0:3], etc.
+
+    Args:
+        arr: list, input stream of numbers
+
+    Returns:
+        m: list, M, stream of medians. I.e. M[0] is the median of arr[0],
+        M[1] is the median value of arr[0:2], M[2] --> arr[0:3], etc.
+
     """
     # Min and max heaps. Max heap has the smaller half of numbers seen so far, min heap the rest
     h_low = heap.MaxHeap()
