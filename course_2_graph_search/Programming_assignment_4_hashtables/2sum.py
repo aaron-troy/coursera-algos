@@ -5,11 +5,16 @@ the best we can do in Python. The dict implementation is still light years faste
 """
 
 import time
-def read_input(src : str):
+import cProfile
+def read_input(src: str):
     """
     Read input txt file -- one integer per row.
-    :param src: path to input file
-    :return: list of numbers from input file
+
+    Args:
+        src: string, path to input file
+
+    Returns:
+        arr: list, numbers from input file
     """
     arr = []
     with open(src) as file:
@@ -26,13 +31,19 @@ def compute_2sum(a: list, lw_bnd: int, up_bnd: int):
     :param lw_bnd: lower bound for 2sum range
     :param up_bnd: upper bound for 2sum range
     :return: number of pairs
+    Args:
+        a: list, list of entries to compute 2sum pairs for
+        lw_bnd: int, lower bound for 2sum range
+        up_bnd: int, upper bound for 2sum range
+
+    Returns:
+        num_of_pairs: int, number of 2 two pairs
     """
     # Construct dict hash table
     h = dict.fromkeys(a)
     num_of_pairs = 0
 
     for i in range(lw_bnd, up_bnd+1):
-        print(i)
         for x in h:
             if i - x in h and i - x != x:
                 num_of_pairs += 1
@@ -47,10 +58,8 @@ if __name__ =="__main__":
 
     # Read the input
     stream_in = read_input(source)
-
     begin = time.time()
-    pairs = compute_2sum(stream_in, -10, 10)
+    cProfile.run("compute_2sum(stream_in, -100, 100)")
     print("2Sum ran in:", time.time() - begin, "seconds")
-    print(pairs)
 
 
