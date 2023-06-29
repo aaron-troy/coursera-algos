@@ -1,6 +1,6 @@
 # coursera-algos
-Work associated with the [Cousera algorithms specialization](https://www.coursera.org/specializations/algorithms) taught
-by [Tim Roughgarden](https://timroughgarden.org/) from Stanford University. Included here is the code for my solutions to 
+Work associated with the algorithms specialization taught
+by Tim Roughgarden from Stanford University. Included here is the code for my solutions to 
 the programming assignments, written in Python. 
 
 The specialization is composed of four sequential courses, with topics for each detailed briefly below:
