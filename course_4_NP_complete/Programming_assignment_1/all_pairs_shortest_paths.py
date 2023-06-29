@@ -32,29 +32,36 @@ class Vertex:
     """
     def __init__(self, key):
         """
-        Vertex class constructor
-        :param key: unique, hashable identifier for the vertex
+        Constructor
+        Args:
+            key: unique, hashable identifier for the Vertex
         """
         self.key = key
         self.out_edges = {}
         self.in_edges = {}
 
-    def add_out_edge(self, dest, cost):
+    def add_out_edge(self, dest, weight: float=0):
         """
-        Add an out-going edge to the vertex
-        :param dest: hashable identifier for the edge destination
-        :param cost: edge weight
-        :return: None
+        Add an out-going wegithed edge to the vertex
+        Args:
+            dest: identifier for the edge end Vertex 
+            weight: float, weight for the edge to be added, optional 
+
+        Returns:
+            None
         """
         self.out_edges[dest] = cost
         return None
 
-    def add_in_edge(self, start, cost):
+    def add_in_edge(self, start, weight: float=0):
         """
-        Add an incoming edge to the vertex
-        :param start: hashable identifier for the start of the incoming edge
-        :param cost: edge weight
-        :return: None
+        Add an incoming weighted edge to the vertex
+        Args:
+            start: identifier for the start Vertex of the edge
+            weight: float, weight for the edge to be added, optional
+
+        Returns:
+            None
         """
         self.in_edges[start] = cost
         return None
@@ -66,9 +73,6 @@ class Graph:
     def __init__(self):
         """
         Graph class constructor.
-
-        self.vertices - hash table for Vertex objects
-        Self.num_vertices - int, current number of vertices
         """
         self.vertices = {}
         self.num_vertices = 0
@@ -78,21 +82,29 @@ class Graph:
     def add_vertex(self, key):
         """
         Add a vertex to the graph
-        :param key: unique, hashable identifier for the vertex
-        :return: None
+
+        Args:
+            key: unique, hashable identifier for the vertex
+
+        Returns:
+            None
         """
         if key not in self.vertices:
             self.vertices[key] = Vertex(key)
             self.num_vertices += 1
         return None
 
-    def add_edge(self, start, dest, cost):
+    def add_edge(self, start, dest, weight: float = 0):
         """
         Add an edge to the graph. Adds start and end vertices if not already in the graph.
-        :param start: unique, hashable identifier of for the edge start vertex
-        :param dest: unique, hashable identifier of for the edge end vertex
-        :param cost: cost for the edge
-        :return: None
+
+        Args:
+            start: unique, hashable identifier of for the edge start vertex
+            dest:  unique, hashable identifier of for the edge end vertex
+            weight: float, weight for the edge to be added, optional
+
+        Returns:
+            None
         """
         if start not in self.vertices:
             self.add_vertex(start)
@@ -107,11 +119,14 @@ class Graph:
 
     def re_weight(self, W):
         """
-        Re-weights edges to ensure non-negative values using computed vertex weightings
+         Re-weights edges to ensure non-negative values using computed vertex weightings
 
-        :param W: array, vertex weights computed as the minimum path lengths from a dummy node with o cost connection
+        Args:
+            W: array, vertex weights computed as the minimum path lengths from a dummy node with o cost connection
                   to all nodes.
-        :return: None
+
+        Returns:
+            None
         """
         for u, u_vert in self.vertices.items():
             for v, c_uv in u_vert.out_edges.items():
@@ -134,7 +149,9 @@ class Graph:
         added vertex. Negative cycles are detected of the fly by checking for negative path lengths from
         any vertex to itself. Computation is terminated upon finding a negative cycle as shortest paths are undefined.
         Running time is O(V^3)
-        :return: A, np array of all pairs of minimum path lengths
+
+        Returns:
+            A: np array of all pairs of minimum path lengths
         """
 
         print("Running Floyd-Warshall algo")
@@ -179,7 +196,8 @@ class Graph:
 
         Running time is O(n^2log(n) + mn), the n calls to Dijkstra (nlog(n)) plus the single call the Bellman-Ford
 
-        :return: A, np.array with the shortest path lengths
+        Returns:
+            A: np.array with the shortest path lengths
         """
 
         print("Running Johnson's algo")
@@ -204,7 +222,7 @@ class Graph:
         print("Smallest minimum pair path:", A.min())
         return A
 
-    def bellman_ford(self, start, check_negative: bool = True, re_weight: bool = False):
+    def bellman_ford(self, start: int, check_negative: bool = True, re_weight: bool = False):
         """
         Bellman-Ford algorithm for computing the minimum path lengths from a single source.
 
@@ -214,13 +232,20 @@ class Graph:
 
         Running time is O(mn), number of edges times number of vertices
 
-        :param start: int, identifies the starting node
-        :param check_negative: bool, optional. Triggers an additional iteration (checking with n edges) to test for
+        :param start:
+        :param check_negative:
+        :param re_weight:
+        :return:
+        Args:
+            start: int, identifies the starting node
+            check_negative: bool, optional. Triggers an additional iteration (checking with n edges) to test for
                any negative cycles, in which case the shortest paths are not well-defined. Default is True.
-        :param re_weight: bool, optional. Triggers the addition of dummy node which is used as the start. The returned
+            re_weight: bool, optional. Triggers the addition of dummy node which is used as the start. The returned
                array then contains the vertex weights that allow re-weighting to remove negative edges in Johnson's
                algo. Default is False.
-        :return: None if negative cycles detected. Array with the shortest path lengths otherwise.
+
+        Returns:
+            A: np array with the shortest path lengths. None if negative cycles detected.
         """
 
         # Set up array for storing path lengths. If we want to re-weight, IC is a path length of zero to all nodes
@@ -251,7 +276,7 @@ class Graph:
                     return None
         return A
 
-    def dijkstra(self, start):
+    def dijkstra(self, start: int):
         """
         Min heap based implementation of Dijkstra's algorithm for an undirected graph. Runs in O(nlog(n)). The graph
         must contain no negative edges for the routine to yield a correct result. If negative edges are present, the
@@ -259,8 +284,11 @@ class Graph:
 
         Running time is O(nlog(n))
 
-        :param start: int, start vertex
-        :return: Array with the shortest path lengths
+        Args:
+            start:  int, start vertex
+
+        Returns:
+            A: np array with the shortest path lengths
         """
 
         # Sets to keep track of what is explored and what isn't
