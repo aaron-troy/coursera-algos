@@ -53,8 +53,7 @@ class MinHeap:
     def min_child(self, i: int):
         """
         Return minimum weight child for heap entry at index i.
-        :param i:
-        :return:
+
         Args:
             i: int, index of parent in heap array
 
