@@ -26,10 +26,14 @@ class MinHeap:
 
     def insert(self, weight, ident):
         """
-        Insert an element into the heap. Sift up to maintain the min heap property
-        :param weight: weight to insert into heap
-        :param ident: unique, hashable identifier for element to insert
-        :return: None
+         Insert an element into the heap. Sift up to maintain the min heap property
+
+        Args:
+            weight: weight to insert into heap
+            ident: unique, hashable identifier for element to insert
+
+        Returns:
+            None
         """
 
         # Only add a weight, ident to the heap if the new weight is smaller or it's not in the heap already.
@@ -46,11 +50,16 @@ class MinHeap:
             self.sift_up(self.heap_size)
         return None
 
-    def min_child(self, i):
+    def min_child(self, i: int):
         """
         Return minimum weight child for heap entry at index i.
-        :param i: int, index of parent in heap array
-        :return: int, index of the minimum child in the heap array
+        :param i:
+        :return:
+        Args:
+            i: int, index of parent in heap array
+
+        Returns:
+            int, index of the minimum child in the heap array
         """
         # Check there are children
         if 2 * i > self.heap_size:
@@ -65,12 +74,15 @@ class MinHeap:
             else:
                 return 2 * i + 1
 
-
     def parent(self, i):
         """
         Get the parent for heap entry i, if it exists
-        :param i: index of the child element in the heap array
-        :return: int, index of the parent element in the heap array
+
+        Args:
+            i: index of the child element in the heap array
+
+        Returns:
+            int, index of the parent element in the heap array
         """
         pt = int(i / 2)
         if pt == 0:
@@ -81,8 +93,12 @@ class MinHeap:
     def sift_up(self, i):
         """
         Sift an element upwards until the heap property is restored
-        :param i: index of the element to sift upwards
-        :return: None
+
+        Args:
+            i: index of the element to sift upwards
+
+        Returns:
+            None
         """
         # Get the initial parent
         pt = self.parent(i)
@@ -101,8 +117,11 @@ class MinHeap:
     def sift_down(self, i):
         """
         Sift an element downwards until the heap property is restored
-        :param i: index of the element to sift downwards
-        :return: None
+        Args:
+            i: index of the element to sift downwards
+
+        Returns:
+            None
         """
         # Get the min child of the starting node
         mc = self.min_child(i)
@@ -119,9 +138,12 @@ class MinHeap:
     def pop_root(self):
         """
         Returns the minimum weight and corresponding identifier of the heap, by definition the root.
-        :return: (min_weight, min_ident) - min_weight - the weight of the entry at the root of the heap;
+
+        Returns:
+            (min_weight, min_ident) - min_weight - the weight of the entry at the root of the heap;
                  min_ident: hashable identifier for the root element
         """
+
         assert self.heap_size > 0, 'Empty heap!'
         # Get the minimum ident, stored at 1 index
         min_weight = self.heap_arr[1]
